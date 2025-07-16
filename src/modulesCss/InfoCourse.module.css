@@ -1,0 +1,369 @@
+.divContainer {
+    width: 95%;
+    height: 250px;
+    display: flex;
+    box-shadow: 0 4px 0px rgba(0, 0, 0, .2);
+    margin: 0 auto;
+}
+
+.divContainerInfo {
+    width: 60%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.divInfoCourse {
+    width: 100%;
+    height: 60%;
+    padding-bottom: 10px;
+}
+
+.divInfoCourse h4 {
+    font-weight: 300;
+}
+
+.divConfCourse {
+    width: 100%;
+    height: 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+    padding-left: 10px;
+}
+
+.divConfCert {
+    width: 40%;
+    height: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: start;
+
+
+}
+
+.inputPorcentual {
+    width: 50px;
+    border: none;
+    border-bottom: 2px solid rgb(54, 53, 53);
+    margin: 0 5px;
+    outline: none;
+    /* Elimina el borde al hacer foco */
+    transition: border-color 0.3s ease;
+
+}
+
+.inputPorcentual:focus {
+    border-bottom: 2px solid rgb(4, 177, 245);
+}
+
+.uploadContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    margin: auto;
+    background-color: #fff;
+}
+
+.uploadButton {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.uploadButton:hover {
+    background-color: #0056b3;
+}
+
+.uploadButton2 {
+    padding: 10px 15px;
+    background-color: #25803c;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: none;
+}
+
+.uploadButton2:hover {
+    background-color: #23cc32;
+}
+
+.hiddenInput {
+    display: none;
+}
+
+.imagePreview {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.previewImg {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cancelButton {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: red;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 25px;
+    height: 25px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.cancelButton:hover {
+    background: darkred;
+}
+
+.uploadImage {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    padding: 8px 12px;
+    background-color: green;
+    color: white;
+    font-size: 14px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
+    border: none;
+}
+
+.uploadImage:hover {
+    background-color: darkgreen;
+}
+
+.imagePreviewContainer {
+    position: relative;
+    display: inline-block;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+    padding-top: 30px;
+    overflow: scroll;
+}
+
+.modalContent {
+    position: relative;
+    top: 20px;
+    width: 900px;
+    height: auto;
+    background: #222;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 8px;
+    padding: 3px;
+    padding-top: 10px;
+    padding-bottom: 10px;
+
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+
+.imageContainer {
+    position: relative;
+    width: 900px;
+
+    height: 100%;
+    min-height: 530px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalImage {
+    min-width: 900px;
+    max-height: 530px;
+    object-fit: contain;
+}
+
+.draggableLabel {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: grab;
+    user-select: none;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.toolbar {
+    position: relative;
+    top: 0px;
+    right: 0;
+    width: 90%;
+    max-width: 800px;
+    margin-bottom: 5px;
+    background: whitesmoke;
+    padding: 10px;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    gap: 10px;
+}
+
+.toolbarLabel {
+    font-size: 14px;
+    font-weight: 500;
+    margin-right: 5px;
+}
+
+.toolbarInput,
+.toolbarSelect,
+.toolbarColorPicker {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+}
+
+.toolbarInput {
+    width: 50px;
+    text-align: center;
+}
+
+.toolbarSelect {
+    width: 120px;
+}
+
+.toolbarColorPicker {
+    cursor: pointer;
+    width: 40px;
+    height: 30px;
+    border: none;
+}
+
+.divSavedCert {
+    position: absolute;
+    right: 0;
+    width: 15%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.loaderOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2;
+}
+
+.loader {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+
+@media (max-width:760px) {
+    .divContainer {
+        width: 100%;
+        height: auto;
+        flex-wrap: wrap;
+        padding-bottom: 10px;
+
+    }
+
+    .divContainerInfo {
+        width: 100%;
+
+    }
+
+    .divInfoCourse {
+        font-size: small;
+    }
+
+    .divInfoCourse h3 {
+        font-size: 14px;
+        margin-left: 3px;
+    }
+
+    .divConfCert {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+    }
+
+    .imagePreviewContainer {
+        margin: 5px !important;
+    }
+
+    .uploadButton2 {
+        margin: 0 !important;
+    }
+
+}

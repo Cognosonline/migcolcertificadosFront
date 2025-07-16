@@ -1,0 +1,89 @@
+.card{
+    width: 100%;
+    height: 12rem;    
+    margin: 5px auto!important;
+    margin-top: 130px;
+    padding-left: 10px;
+    border: 1px rgb(212, 209, 209) solid;
+    border-radius: 5px;
+    -webkit-box-shadow: -3px 7px 6px 1px rgba(156, 155, 156, 0.62);
+    -moz-box-shadow: -3px 7px 6px 1px rgba(177, 174, 174, 0.62);
+    box-shadow: -3px 7px 6px 1px rgba(184, 182, 182, 0.62);
+}
+
+.divIngresar{
+    position: relative;
+    width: 20%;
+    height: 30px;
+    font-size: 16px;
+    border: none;
+    color: aliceblue;
+    border-radius: 10px;
+    background-color:rgb(151, 168, 168);
+    left:250px;
+    cursor: pointer;
+}
+
+.divIngresar:hover{
+    background-color:rgb(47, 124, 124);
+}
+
+h2{
+    color:darkgray;
+    font-size: 20px;
+}
+
+h3{
+    font-size: 17px;
+}
+
+p{
+    font-size: 15px;
+}
+
+.cardCourse{    
+    width: 100%;
+    height: auto;
+    margin: 10px;
+    margin-top: 10px;
+    padding-bottom: 10px;
+}
+
+@media (min-width:1024px) {
+    .cardCourse{
+        max-width: 300px;
+    }
+}
+
+@media (max-width:1024px) {
+    .cardCourse{
+        width: 300px;
+        padding-bottom: 10px;
+        
+    }
+}
+
+@media (min-width:650px) {
+    .cardCourse{        
+        
+        padding-bottom: 10px;        
+    }
+}
+
+@media (max-width:900px) {
+    .cardCourse{
+        width: 260px;
+        margin: 10px auto;
+        padding-bottom: 10px;        
+    }
+}
+
+
+@media(max-width:620px ){
+    .cardCourse{
+        margin: 10px auto;
+        width:90%!important;
+        padding-bottom: 10px;
+        
+    }
+}

@@ -1,0 +1,16 @@
+.divContainer {
+    width: calc(100% - 215px);
+    height: auto;    
+    float: right;
+}
+
+@media (max-width:760px) {
+    .divContainer{
+        width: 100%;
+        height: calc(100vh - 150px);
+        float: none;        
+        margin-top:130px;
+        
+    }
+
+}

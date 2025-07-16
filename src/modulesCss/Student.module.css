@@ -1,0 +1,62 @@
+.divContainer {
+    width: calc(100% - 215px);
+    height: 100%;
+    background-color: rgb(29, 20, 20);    
+    float: right;
+}
+
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+.modalContent {
+    position: relative;
+    width: 900px;
+    height:auto;
+    background: #222;
+    display: flex;
+    justify-content:center;
+    align-items: center;
+    flex-direction: column;
+    border-radius: 8px;
+    padding: 3px;
+    padding-top: 10px;
+    
+}
+
+.closeButton {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    color: white;
+    cursor: pointer;
+}
+
+.imageContainer {
+    position: relative;
+    width: 900px;
+
+    height: 100%;
+    min-height: 530px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalImage {
+    min-width: 900px;
+    max-height: 530px;
+    object-fit: contain;
+}

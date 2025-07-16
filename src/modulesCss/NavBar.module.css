@@ -1,0 +1,48 @@
+.imgNav {
+    width: 100%;
+    height: auto;
+    object-fit: contain;
+    
+}
+
+.imgMobile {
+    height: 120px;
+}
+
+.divSeparated {
+    flex-grow: 1;
+}
+
+.listBttn{
+    background-color: transparent;
+    
+}
+
+.listBttn:hover{
+    background-color: rgb(200, 202, 204);
+    border-bottom: 1px solid rgb(63, 62, 62);
+}
+
+.bttn{
+    background-color: transparent;
+    border: none;
+    min-height:50px;
+    color: whitesmoke;
+    cursor: pointer;
+}
+
+.bttn:hover{
+    background-color: rgb(4, 57, 104);
+    border-bottom: 1px solid white;
+}
+
+@media (min-width:600px) {
+    .container{
+        width: 13em!important;
+        left: 0!important;
+        height: 100%;
+    }
+    
+    
+    
+}
