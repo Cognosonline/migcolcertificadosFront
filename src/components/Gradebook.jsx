@@ -1,402 +1,770 @@
-import * as React from 'react';
-import { styled } from '@mui/material/styles';
-import Table from '@mui/material/Table';
-import TableBody from '@mui/material/TableBody';
-import TableCell, { tableCellClasses } from '@mui/material/TableCell';
-import TableContainer from '@mui/material/TableContainer';
-import TableHead from '@mui/material/TableHead';
-import TableRow from '@mui/material/TableRow';
-import Paper from '@mui/material/Paper';
-import { useStateValue } from '../context/GlobalContext.jsx';
-import style from '../modulesCss/Gradebook.module.css';
-import { Button } from '@mui/material';
-import { useEffect } from 'react';
-import { jsPDF } from "jspdf";
-import html2canvas from "html2canvas";
+"use client"
 
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-
-import Typography from '@mui/material/Typography';
-import { useState } from 'react';
-import Loader from './Loader.jsx';
-
-
-
+import { useEffect, useState } from "react"
+import {
+	Box,
+	Typography,
+	TextField,
+	Table,
+	TableBody,
+	TableCell,
+	TableContainer,
+	TableHead,
+	TableRow,
+	Paper,
+	Button,
+	Card,
+	CardContent,
+	CardActions,
+	InputAdornment,
+	Chip,
+	Avatar,
+	useTheme,
+	alpha,
+	Fade,
+	Zoom,
+	IconButton,
+	Tooltip,
+	Modal,
+} from "@mui/material"
+import {
+	Search as SearchIcon,
+	School as SchoolIcon,
+	Person as PersonIcon,
+	Grade as GradeIcon,
+	Close as CloseIcon,
+	GetApp as GetAppIcon,
+	Assignment as AssignmentIcon,
+	CheckCircle as CheckCircleIcon,
+	Cancel as CancelIcon,
+} from "@mui/icons-material"
+import { styled } from "@mui/material/styles"
+import { useStateValue } from "../context/GlobalContext.jsx"
+import style from "../modulesCss/Gradebook.module.css"
+import { jsPDF } from "jspdf"
+import html2canvas from "html2canvas"
+import Loader from "./Loader.jsx"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-    [`&.${tableCellClasses.head}`]: {
-        backgroundColor: theme.palette.common.white,
-        color: theme.palette.common.smoke,
-        fontWeight: '600',
-        fontSize: 15
-
-    },
-    [`&.${tableCellClasses.body}`]: {
-        fontSize: 14,
-    },
-}));
+	[`&.MuiTableCell-head`]: {
+		background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+		color: "#ffffff",
+		fontWeight: 700,
+		fontSize: "0.95rem",
+		textTransform: "uppercase",
+		letterSpacing: "0.5px",
+		borderBottom: "none",
+		boxShadow: "0 2px 8px rgba(0,0,0,0.1)",
+	},
+	[`&.MuiTableCell-body`]: {
+		fontSize: "0.9rem",
+		borderBottom: `1px solid ${alpha(theme.palette.grey[300], 0.5)}`,
+		padding: "16px",
+	},
+}))
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
-    '&:nth-of-type(odd)': {
-        backgroundColor: theme.palette.action.hover,
-    },
-    // hide last border
-    '&:last-child td, &:last-child th': {
-        border: 0,
-    },
-}));
+	"&:nth-of-type(even)": {
+		backgroundColor: alpha(theme.palette.primary.main, 0.02),
+	},
+	"&:hover": {
+		backgroundColor: alpha(theme.palette.primary.main, 0.05),
+		transform: "translateY(-1px)",
+		boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+	},
+	transition: "all 0.2s ease-in-out",
+	"&:last-child td, &:last-child th": {
+		border: 0,
+	},
+}))
 
-
+const GradeChip = styled(Chip)(({ theme, passed }) => ({
+	fontWeight: 600,
+	fontSize: "0.85rem",
+	background: passed
+		? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+		: `linear-gradient(135deg, ${theme.palette.warning.main} 0%, ${theme.palette.warning.dark} 100%)`,
+	color: "#ffffff",
+	boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
+	"& .MuiChip-icon": {
+		color: "#ffffff",
+	},
+}))
 
 export default function GradeBook({
-    fontSize,
-    fontFamily,
-    color,
-    isItalic,
-    namePosition,
-    idPosition,
-    imageCert,
-    reqScore
+	fontSize,
+	fontFamily,
+	color,
+	isItalic,
+	namePosition,
+	idPosition,
+	imageCert,
+	reqScore,
 }) {
+	const { course, user } = useStateValue()
+	const [windowWidth, setWindowWidth] = useState(window.innerWidth)
+	const [filteredStudents, setFilteredStudents] = useState(course.students)
+	const [isModalOpen, setIsModalOpen] = useState(false)
+	const [selectedStudent, setSelectedStudent] = useState(null)
+	const [lodingImage, setLodiangImage] = useState(true)
+	const [userDow, setUserDow] = useState(null)
+	const [searchInput, setSearchInput] = useState("")
+	const theme = useTheme()
 
-    const { course, user } = useStateValue();
-    const [windowWidth, setWindowWidth] = useState(window.innerWidth);
-    const [filteredStudents, setFilteredStudents] = useState(course.students);
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    // const [name, setName] = useState("Nombre");
-    //const [id, setId] = useState("Cedula");
-    const [selectedStudent, setSelectedStudent] = useState(null);
-    const [lodingImage, setLodiangImage] = useState(true)
-    const [userDow, setUserDow] = useState(null)
-    const [searchInput, setSearchInput] = useState('');
+	const positionDataCertificate = (row) => {
+		const name = document.getElementById("name")
+		const cedula = document.getElementById("cedula")
 
+		name.innerHTML = "&lt;&lt;Nombre&gt;&gt;"
+		const placeholderWidth = name.getBoundingClientRect().width
+		const halfPlaceholder = placeholderWidth / 2
+		const originalLeft = namePosition.left
+		const centroPlaceholder = originalLeft + halfPlaceholder
 
+		name.innerHTML = row.user.name.toUpperCase()
+		cedula.innerHTML = row.user.externalId
 
-    const positionDataCertificate = (row) => {
-        const name = document.getElementById('name');
-        const cedula = document.getElementById('cedula');
-        const container = document.querySelector(`.${style.imageContainer}`);
+		const userNameWidth = name.getBoundingClientRect().width
+		const halfUserName = userNameWidth / 2
+		let nuevoLeft = originalLeft + placeholderWidth
+		nuevoLeft -= halfPlaceholder
+		nuevoLeft -= halfUserName
+		name.style.left = `${nuevoLeft}px`
+	}
 
+	const DownloadButton = () => {
+		const downloadPDF = async () => {
+			const imageContainer = document.querySelector(`.${style.imageContainer}`)
+			const canvas = await html2canvas(imageContainer, { scale: 4 })
+			const imgData = canvas.toDataURL("image/png")
 
+			const pdf = new jsPDF("l", "mm", "a4")
+			const pageWidth = pdf.internal.pageSize.getWidth()
+			const pageHeight = pdf.internal.pageSize.getHeight()
+			const margin = 10
+			const imgWidth = pageWidth - 2 * margin
+			const imgHeight = pageHeight - 2 * margin
 
-        // Establecer placeholder
-        name.innerHTML = '&lt;&lt;Nombre&gt;&gt;';
+			pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight)
+			pdf.rect(margin, margin, imgWidth, imgHeight)
+			pdf.save(`Certificado_${course.course.name}_${userDow}.pdf`)
+		}
 
+		return (
+			<Button
+				onClick={downloadPDF}
+				variant="contained"
+				startIcon={<GetAppIcon />}
+				sx={{
+					background: `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`,
+					color: "#ffffff",
+					fontWeight: 600,
+					px: 3,
+					py: 1.5,
+					boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+					"&:hover": {
+						transform: "translateY(-2px)",
+						boxShadow: "0 6px 20px rgba(0,0,0,0.3)",
+					},
+					transition: "all 0.2s ease-in-out",
+				}}
+			>
+				Descargar PDF
+			</Button>
+		)
+	}
 
-        // Obtener posición relativa al contenedor
-        const placeholderWidth = name.getBoundingClientRect().width;
-        const halfPlaceholder = placeholderWidth / 2;
+	const renderScore = (score) => {
+		if (!score || score.score === 0) return "--"
+		if (score.scaleType === "Percent") return `${score.score}%`
+		if (score.scaleType === "Tabular") return score.text
+		return score.score
+	}
 
-        // Paso 3: obtener el left inicial desde props (posición original del nombre)
-        const originalLeft = namePosition.left;
+	const isStudentPassed = (student) => {
+		if (!student.score || student.score === 0) return false
+		return student.score.possible * (reqScore / 100) <= student.score.score
+	}
 
-        // Paso 4: calcular el centro del placeholder con respecto al left
-        const centroPlaceholder = originalLeft + halfPlaceholder;
+	useEffect(() => {
+		const filtered = course.students?.filter((student) => {
+			const externalId = student?.user?.externalId || ""
+			const name = student?.user?.name || ""
+			return (
+				externalId.toLowerCase().includes(searchInput.toLowerCase()) ||
+				name.toLowerCase().includes(searchInput.toLowerCase())
+			)
+		})
+		setFilteredStudents(filtered)
+	}, [searchInput, course.students])
 
-        // Paso 5: ahora asignamos el nombre real
-        name.innerHTML = row.user.name.toUpperCase();
-        cedula.innerHTML = row.user.externalId;
+	useEffect(() => {
+		const handleResize = () => setWindowWidth(window.innerWidth)
+		window.addEventListener("resize", handleResize)
+		return () => window.removeEventListener("resize", handleResize)
+	}, [course.students])
 
-        // Paso 6: obtener el nuevo ancho del span con el nombre real
-        const userNameWidth = name.getBoundingClientRect().width;
-        const halfUserName = userNameWidth / 2;
+	useEffect(() => {
+		if (isModalOpen && selectedStudent) {
+			setTimeout(() => {
+				positionDataCertificate(selectedStudent)
+			}, 2000)
+		}
+	}, [isModalOpen, selectedStudent])
 
-        // Paso 7: mover el span hacia la derecha sumando el ancho del placeholder
-        let nuevoLeft = originalLeft + placeholderWidth;
+	return (
+		<Box>
+			{/* Header mejorado */}
+			<Fade in={true} timeout={800}>
+				<Box
+					sx={{
+						background: `linear-gradient(135deg, ${theme.palette.info.main} 0%, ${theme.palette.info.dark} 100%)`,
+						color: "#ffffff",
+						p: { xs: 3, sm: 4 },
+						mb: 3,
+						position: "relative",
+						overflow: "hidden",
+						"&::before": {
+							content: '""',
+							position: "absolute",
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							background:
+								'url("data:image/svg+xml,%3Csvg width="40" height="40" viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg"%3E%3Cg fill="%23ffffff" fillOpacity="0.05"%3E%3Cpath d="M20 20c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm10 0c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z"/%3E%3C/g%3E%3C/svg%3E")',
+							zIndex: 0,
+						},
+					}}
+				>
+					<Box sx={{ position: "relative", zIndex: 1 }}>
+						<Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+							<Box
+								sx={{
+									p: 1.5,
+									backdropFilter: "blur(10px)",
+								}}
+							>
+								<AssignmentIcon sx={{ fontSize: 28, color: "#ffffff" }} />
+							</Box>
+							<Typography
+								variant="h4"
+								sx={{
+									fontWeight: 700,
+									fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2rem" },
+									textShadow: "0 2px 4px rgba(0,0,0,0.2)",
+								}}
+							>
+								Libro de Calificaciones
+							</Typography>
+						</Box>
 
-        // Paso 8: restar la mitad del ancho del placeholder
-        nuevoLeft -= halfPlaceholder;
+						{/* Barra de búsqueda mejorada */}
+						<Box sx={{ maxWidth: 500 }}>
+							<TextField
+								placeholder="Buscar estudiante por nombre o ID..."
+								value={searchInput}
+								onChange={(e) => setSearchInput(e.target.value)}
+								fullWidth
+								size="medium"
+								InputProps={{
+									startAdornment: (
+										<InputAdornment position="start">
+											<SearchIcon sx={{ color: theme.palette.text.secondary }} />
+										</InputAdornment>
+									),
+								}}
+								sx={{
+									"& .MuiOutlinedInput-root": {
+										background: "#ffffff",
+										fontSize: "0.95rem",
+										boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+										"& fieldset": {
+											borderColor: "transparent",
+										},
+										"&:hover fieldset": {
+											borderColor: alpha(theme.palette.info.main, 0.3),
+										},
+										"&.Mui-focused fieldset": {
+											borderColor: theme.palette.info.main,
+											borderWidth: 2,
+										},
+									},
+								}}
+							/>
+						</Box>
 
-        // Paso 9: restar la mitad del ancho del nombre real
-        nuevoLeft -= halfUserName;
+						{/* Estadísticas */}
+						<Box sx={{ display: "flex", gap: 2, mt: 3, flexWrap: "wrap" }}>
+							<Chip
+								icon={<PersonIcon />}
+								label={`${filteredStudents?.length || 0} estudiantes`}
+								sx={{
+									background: alpha("#ffffff", 0.2),
+									color: "#ffffff",
+									fontWeight: 600,
+									backdropFilter: "blur(10px)",
+									"& .MuiChip-icon": { color: "#ffffff" },
+								}}
+							/>
+							<Chip
+								icon={<GradeIcon />}
+								label={`Requisito: ${reqScore || 0}%`}
+								sx={{
+									background: alpha("#ffffff", 0.2),
+									color: "#ffffff",
+									fontWeight: 600,
+									backdropFilter: "blur(10px)",
+									"& .MuiChip-icon": { color: "#ffffff" },
+								}}
+							/>
+						</Box>
+					</Box>
+				</Box>
+			</Fade>
 
-        // Paso 10: aplicar el nuevo valor de left
-        name.style.left = `${nuevoLeft}px`;
+			{/* Contenido responsive */}
+			{windowWidth < 900 ? (
+				// Vista móvil con cards mejoradas
+				<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+					{course.students ? (
+						filteredStudents.map((row, index) => (
+							<Fade key={row.user.externalId} in={true} timeout={300 + index * 100}>
+								<Card
+									sx={{
+										background: "#ffffff",
+										boxShadow: "0 4px 16px rgba(0,0,0,0.1)",
+										transition: "all 0.3s ease",
+										"&:hover": {
+											transform: "translateY(-4px)",
+											boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+										},
+									}}
+								>
+									<CardContent sx={{ pb: 1 }}>
+										<Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: 2 }}>
+											<Avatar
+												sx={{
+													background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+													color: "#ffffff",
+													fontWeight: 600,
+												}}
+											>
+												{row.user.name.charAt(0)}
+											</Avatar>
+											<Box sx={{ flex: 1 }}>
+												<Typography
+													variant="h6"
+													sx={{
+														fontWeight: 600,
+														fontSize: "1.1rem",
+														color: theme.palette.text.primary,
+														mb: 0.5,
+													}}
+												>
+													{row.user.name}
+												</Typography>
+												<Typography
+													variant="body2"
+													sx={{
+														color: theme.palette.text.secondary,
+														fontSize: "0.9rem",
+													}}
+												>
+													ID: {row.user.externalId}
+												</Typography>
+											</Box>
+										</Box>
 
-    };
+										<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+											<Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+												Calificación:
+											</Typography>
+											<GradeChip
+												label={renderScore(row.score)}
+												passed={isStudentPassed(row)}
+												icon={isStudentPassed(row) ? <CheckCircleIcon /> : <CancelIcon />}
+											/>
+										</Box>
+									</CardContent>
 
-    const DownloadButton = () => {
+									<CardActions sx={{ px: 2, pb: 2 }}>
+										<Button
+											variant="contained"
+											size="small"
+											disabled={!isStudentPassed(row)}
+											startIcon={<SchoolIcon />}
+											onClick={(e) => {
+												e.preventDefault()
+												setIsModalOpen(true)
+												setSelectedStudent(row)
+												setUserDow(row.user.externalId)
+											}}
+											sx={{
+												background: isStudentPassed(row)
+													? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+													: theme.palette.grey[300],
+												color: "#ffffff",
+												fontWeight: 600,
+												"&:hover": {
+													transform: isStudentPassed(row) ? "translateY(-1px)" : "none",
+													boxShadow: isStudentPassed(row) ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
+												},
+												"&:disabled": {
+													color: theme.palette.text.disabled,
+												},
+											}}
+										>
+											Certificado
+										</Button>
+									</CardActions>
+								</Card>
+							</Fade>
+						))
+					) : (
+						<div></div>
+					)}
+				</Box>
+			) : (
+				// Vista desktop con tabla mejorada
+				<Zoom in={true} timeout={1000}>
+					<TableContainer
+						component={Paper}
+						sx={{
+							boxShadow: "0 8px 32px rgba(0,0,0,0.12)",
+							overflow: "hidden",
+							maxHeight: "60vh",
+						}}
+					>
+						<Table stickyHeader>
+							<TableHead>
+								<TableRow>
+									<StyledTableCell>
+										<Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+											<PersonIcon sx={{ fontSize: 20 }} />
+											Nombres y Apellidos
+										</Box>
+									</StyledTableCell>
+									<StyledTableCell align="center">
+										<Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center" }}>
+											<AssignmentIcon sx={{ fontSize: 20 }} />
+											Documento
+										</Box>
+									</StyledTableCell>
+									<StyledTableCell align="center">
+										<Box sx={{ display: "flex", alignItems: "center", gap: 1, justifyContent: "center" }}>
+											<GradeIcon sx={{ fontSize: 20 }} />
+											Calificación
+										</Box>
+									</StyledTableCell>
+									<StyledTableCell align="center">Estado</StyledTableCell>
+									<StyledTableCell align="center">Acción</StyledTableCell>
+								</TableRow>
+							</TableHead>
+							<TableBody>
+								{course.students ? (
+									filteredStudents.map((row, index) => (
+										<Fade key={row.user.name} in={true} timeout={200 + index * 50}>
+											<StyledTableRow>
+												<StyledTableCell>
+													<Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
+														<Avatar
+															sx={{
+																background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+																color: "#ffffff",
+																width: 40,
+																height: 40,
+																fontSize: "0.9rem",
+																fontWeight: 600,
+															}}
+														>
+															{row.user.name.charAt(0)}
+														</Avatar>
+														<Typography
+															variant="body1"
+															sx={{
+																fontWeight: 500,
+																color: theme.palette.text.primary,
+															}}
+														>
+															{row.user.name}
+														</Typography>
+													</Box>
+												</StyledTableCell>
+												<StyledTableCell align="center">
+													<Typography
+														variant="body2"
+														sx={{
+															fontFamily: "monospace",
+															background: alpha(theme.palette.grey[100], 0.8),
+															px: 1,
+															py: 0.5,
+															fontWeight: 600,
+														}}
+													>
+														{row.user.externalId}
+													</Typography>
+												</StyledTableCell>
+												<StyledTableCell align="center">
+													<GradeChip
+														label={renderScore(row.score)}
+														passed={isStudentPassed(row)}
+														icon={isStudentPassed(row) ? <CheckCircleIcon /> : <CancelIcon />}
+													/>
+												</StyledTableCell>
+												<StyledTableCell align="center">
+													<Chip
+														label={isStudentPassed(row) ? "Aprobado" : "No aprobado"}
+														color={isStudentPassed(row) ? "success" : "warning"}
+														variant="outlined"
+														size="small"
+													/>
+												</StyledTableCell>
+												<StyledTableCell align="center">
+													<Tooltip title={isStudentPassed(row) ? "Generar certificado" : "Estudiante no aprobado"}>
+														<span>
+															<Button
+																variant="contained"
+																size="small"
+																disabled={!isStudentPassed(row)}
+																startIcon={<SchoolIcon />}
+																onClick={(e) => {
+																	e.preventDefault()
+																	setIsModalOpen(true)
+																	setSelectedStudent(row)
+																	setUserDow(row.user.externalId)
+																}}
+																sx={{
+																	background: isStudentPassed(row)
+																		? `linear-gradient(135deg, ${theme.palette.success.main} 0%, ${theme.palette.success.dark} 100%)`
+																		: theme.palette.grey[300],
+																	color: "#ffffff",
+																	fontWeight: 600,
+																	minWidth: 120,
+																	"&:hover": {
+																		transform: isStudentPassed(row) ? "translateY(-1px)" : "none",
+																		boxShadow: isStudentPassed(row) ? "0 4px 12px rgba(0,0,0,0.2)" : "none",
+																	},
+																	"&:disabled": {
+																		color: theme.palette.text.disabled,
+																	},
+																}}
+															>
+																Certificado
+															</Button>
+														</span>
+													</Tooltip>
+												</StyledTableCell>
+											</StyledTableRow>
+										</Fade>
+									))
+								) : (
+									<div></div>
+								)}
+							</TableBody>
+						</Table>
+					</TableContainer>
+				</Zoom>
+			)}
 
+			{/* Modal compacto mejorado */}
+			<Modal
+				open={isModalOpen}
+				onClose={() => setIsModalOpen(false)}
+				closeAfterTransition
+				sx={{
+					zIndex: theme.zIndex.modal + 1,
+					backdropFilter: "blur(4px)",
+					backgroundColor: "rgba(0, 0, 0, 0.4)",
+				}}
+				BackdropProps={{
+					sx: {
+						backdropFilter: "blur(4px)",
+						backgroundColor: "rgba(0, 0, 0, 0.4)",
+					},
+				}}
+			>
+				<Fade in={isModalOpen}>
+					<Box
+						sx={{
+							position: "fixed",
+							top: 0,
+							left: 0,
+							right: 0,
+							bottom: 0,
+							display: "flex",
+							alignItems: "center",
+							justifyContent: "center",
+							p: 3,
+							outline: "none",
+						}}
+						onClick={() => setIsModalOpen(false)}
+					>
+						{/* Botón de cerrar en la esquina superior derecha de toda la ventana */}
+						<IconButton
+							onClick={() => setIsModalOpen(false)}
+							sx={{
+								position: "fixed",
+								top: 20,
+								right: 20,
+								zIndex: theme.zIndex.modal + 2,
+								background: alpha("#000000", 0.8),
+								color: "#ffffff",
+								width: 48,
+								height: 48,
+								backdropFilter: "blur(10px)",
+								"&:hover": {
+									background: alpha("#000000", 0.9),
+									transform: "scale(1.1)",
+								},
+								transition: "all 0.2s ease",
+								boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+							}}
+						>
+							<CloseIcon sx={{ fontSize: 24 }} />
+						</IconButton>
 
-        const downloadPDF = async () => {
-            const imageContainer = document.querySelector(`.${style.imageContainer}`);
-            // Capturar el contenedor como imagen
-            const canvas = await html2canvas(imageContainer, {
-                scale: 4  // Aumenta la resolución (puedes cambiar el valor a 3, 4, etc., dependiendo de la calidad que desees)
-            });
-            const imgData = canvas.toDataURL("image/png"); // Convertir a base64
+						<Box
+							onClick={(e) => e.stopPropagation()}
+							sx={{
+								width: "auto",
+								height: "auto",
+								maxWidth: "80vw",
+								maxHeight: "90vh",
+								background: "#ffffff",
+								boxShadow: "0 24px 48px rgba(0,0,0,0.4)",
+								borderRadius: 3,
+								overflow: "hidden",
+								display: "flex",
+								flexDirection: "column",
+							}}
+						>
+							{/* Header minimalista */}
+							<Box
+								sx={{
+									background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
+									color: "#ffffff",
+									p: 2,
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									minHeight: 60,
+								}}
+							>
+								<Typography variant="h6" sx={{ fontWeight: 600 }}>
+									Certificado - {selectedStudent?.user.name}
+								</Typography>
+							</Box>
 
-            // Crear el PDF en horizontal (A4 landscape)
-            const pdf = new jsPDF("l", "mm", "a4");
-            const pageWidth = pdf.internal.pageSize.getWidth();  // 297 mm
-            const pageHeight = pdf.internal.pageSize.getHeight(); // 210 mm
+							{/* Área del certificado */}
+							<Box
+								sx={{
+									flex: 1,
+									display: "flex",
+									alignItems: "center",
+									justifyContent: "center",
+									p: 2,
+									background: alpha(theme.palette.grey[100], 0.3),
+									overflow: "auto",
+								}}
+							>
+								<Box
+									sx={{
+										position: "relative",
+										width: "fit-content",
+										maxWidth: "100%",
+										maxHeight: "100%",
+										boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+										borderRadius: 2,
+										overflow: "hidden",
+										background: "#ffffff",
+									}}
+								>
+									{lodingImage ? (
+										<Box className={style.imageContainer}>
+											<img
+												src={imageCert || "/placeholder.svg"}
+												alt="Certificado"
+												className={style.modalImage}
+												style={{
+													width: "100%",
+													height: "auto",
+													display: "block",
+												}}
+											/>
+											<span
+												id="name"
+												style={{
+													position: "absolute",
+													top: `${namePosition.top}px`,
+													left: `${namePosition.left}px`,
+													fontSize: `${fontSize}px`,
+													fontFamily: fontFamily,
+													color: color,
+													fontStyle: isItalic ? "italic" : "normal",
+													background: "transparent",
+													padding: "8px 12px",
+													cursor: "move",
+													borderRadius: "6px",
+													userSelect: "none",
+													fontWeight: 500,
+													textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+												}}
+											/>
+											<span
+												id="cedula"
+												style={{
+													position: "absolute",
+													top: `${idPosition.top}px`,
+													left: `${idPosition.left}px`,
+													fontSize: `${fontSize}px`,
+													fontFamily: fontFamily,
+													color: color,
+													background: "transparent",
+													fontStyle: isItalic ? "italic" : "normal",
+													padding: "8px 12px",
+													cursor: "move",
+													borderRadius: "6px",
+													userSelect: "none",
+													fontWeight: 500,
+													textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+												}}
+											/>
+										</Box>
+									) : (
+										<Box
+											sx={{
+												width: 600,
+												height: 400,
+												display: "flex",
+												alignItems: "center",
+												justifyContent: "center",
+												background: "#ffffff",
+												borderRadius: 2,
+											}}
+										>
+											<Loader ba={"transparent"} height={"400px"} color={"#156DF9"} load={2} />
+										</Box>
+									)}
+								</Box>
+							</Box>
 
-            // Definir los márgenes (por ejemplo, 10mm)
-            const margin = 10;
-
-            // Calcular el ancho y alto de la imagen para dejar el margen
-            const imgWidth = pageWidth - 2 * margin;  // Restar los márgenes
-            const imgHeight = pageHeight - 2 * margin; // Restar los márgenes
-
-            // Agregar la imagen ajustada para que ocupe el espacio con márgenes
-            pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight);
-
-            // Agregar un borde alrededor del contenido
-            pdf.rect(margin, margin, imgWidth, imgHeight);  // Dibujar borde
-
-            // Descargar el PDF
-            pdf.save(`Certificado_${course.course.name}_${userDow}.pdf`);
-        };
-
-
-        return (
-
-            <Button onClick={downloadPDF} sx={{ margin: '10px' }} variant="contained">Descargar PDF</Button>
-
-        );
-    };
-
-
-    const renderScore = (score) => {
-        if (!score || score.score === 0) return '--';
-        if (score.scaleType === 'Percent') return `${score.score}%`;
-        if (score.scaleType === 'Tabular') return score.text;
-        return score.score;
-    };
-    
-    useEffect(() => {
-        const filtered = course.students?.filter(student => {
-            const externalId = student?.user?.externalId || '';
-            const name = student?.user?.name || '';
-            return (
-                externalId.toLowerCase().includes(searchInput.toLowerCase()) ||
-                name.toLowerCase().includes(searchInput.toLowerCase())
-            );
-        });
-        setFilteredStudents(filtered);
-    }, [searchInput, course.students]);
-
-
-    useEffect(() => {
-        const handleResize = () => {
-            setWindowWidth(window.innerWidth);
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, [course.students]);
-
-    useEffect(() => {
-        if (isModalOpen && selectedStudent) {
-            // Espera un tick para asegurarte de que el DOM ya tiene el modal
-            setTimeout(() => {
-                positionDataCertificate(selectedStudent);
-            }, 2000);
-        }
-    }, [isModalOpen, selectedStudent]);
-
-    return (
-        <>
-            {windowWidth < 900 ?
-                <><div style={{ width: '95%', height: 'auto', margin: '20px auto', background: 'black', display: 'flex', justifyContent: 'flex-start' }}>
-                    <input
-                        type="text"
-                        placeholder="Buscar estudiante por nombre o ID"
-                        value={searchInput}
-                        onChange={(e) => setSearchInput(e.target.value)}
-                        style={{
-                            padding: '8px',
-                            width: '250px',
-                            border: '1px solid gray',
-                            borderRadius: '5px'
-                        }}
-                    />
-                </div>
-
-                    <div style={{
-                        width: '100%',
-                        height: 'auto',
-                        display: 'flex',
-                        flexWrap: 'wrap',
-                        justifyContent: 'center',
-                        padding: '10px 0',
-                        backgroundColor: 'rgb(224, 221, 221)',
-                        margin: '2px auto'
-                    }}>
-                        {
-                            course.students ? filteredStudents.map((row) => {
-                                console.log(row.score.score / 100)
-                                console.log(row.score.possible * (reqScore / 100))
-                                console.log(reqScore / 100)
-
-                                return (<Card key={row.user.externalId} sx={{ width: '90%', marginTop: '10px', color: 'black' }}>
-                                    <CardContent>
-                                        <Typography sx={{ fontSize: 17 }} gutterBottom>
-                                            {row.user.name}
-                                        </Typography>
-                                        <Typography sx={{ fontSize: 15 }} color="text.secondary" gutterBottom>
-                                            ID: {row.user.externalId}
-                                        </Typography>
-                                        <Typography variant="h5" component="div">
-
-                                        </Typography>
-                                        <Typography sx={{ mb: 1.5 }} >
-                                            NOTA: {renderScore(row.score)}
-                                        </Typography>
-
-                                    </CardContent>
-                                    <CardActions>
-                                        {
-                                            row.score === 0 || row.score.possible * reqScore > row.score.score ?
-                                                <Button variant='contained' color='success' disabled size='small'
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        //visabledCertificate(row)
-                                                    }}
-
-                                                >Certificado</Button>
-                                                :
-                                                <Button variant='contained' color='success' size='small'
-                                                    onClick={(e) => {
-                                                        e.preventDefault()
-                                                        setIsModalOpen(true);
-                                                        setSelectedStudent(row);
-                                                        setUserDow(row.user.externalId)
-                                                        //positionDataCertificate(row)
-
-
-                                                        //visabledCertificate(row)
-                                                    }}>Certificado</Button>
-                                        }
-
-                                    </CardActions>
-                                </Card>)
-                            })
-                                : <div></div>}
-                    </div></>
-                : <>
-                    <div style={{ width: '95%', background: '#1d1d1d', padding: '10px', margin: '20px auto', display: 'flex', justifyContent: 'flex-start' }}>
-                        <input
-                            type="text"
-                            placeholder="Buscar estudiante por nombre o ID"
-                            value={searchInput}
-                            onChange={(e) => setSearchInput(e.target.value)}
-                            style={{
-                                padding: '8px',
-                                width: '250px',
-                                border: '1px solid gray',
-                                borderRadius: '5px'
-                            }}
-                        />
-                    </div>
-
-                    <TableContainer component={Paper} sx={{
-                        paddingBottom: '20px',
-                        height: '50vh'
-
-                    }}>
-                        <Table sx={{ width: '95%', margin: '0 auto' }} aria-label="customized table">
-                            <TableHead sx={{ fontWeight: 'bold' }}>
-                                <TableRow>
-                                    <StyledTableCell>Nombres y Apellidos</StyledTableCell>
-                                    <StyledTableCell align="right">Numero de Documento</StyledTableCell>
-                                    <StyledTableCell align="right">Calificacion General</StyledTableCell>
-                                    <StyledTableCell align="right">     </StyledTableCell>
-                                    <StyledTableCell align="right">     </StyledTableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {
-
-                                    course.students ? filteredStudents.map((row) => (
-                                        <StyledTableRow key={row.user.name}>
-                                            <StyledTableCell component="th" scope="row">
-                                                {row.user.name}
-                                            </StyledTableCell>
-                                            <StyledTableCell align="center">{row.user.externalId}</StyledTableCell>
-                                            <StyledTableCell align="center"> {renderScore(row.score)}</StyledTableCell>
-                                            <StyledTableCell align="right">
-                                                {
-                                                    row.score === 0 || row.score.possible * (reqScore / 100) >= row.score.score ?
-                                                        <Button variant='contained' color='success' disabled size='small'>Certificado</Button>
-                                                        :
-                                                        <Button variant='contained' color='success' size='small'
-                                                            onClick={(e) => {
-                                                                e.preventDefault()
-                                                                setIsModalOpen(true)
-                                                                setSelectedStudent(row);
-                                                                setUserDow(row.user.externalId)
-                                                                //positionDataCertificate(row)
-
-                                                                //visabledCertificate(row)
-                                                            }}>Certificado</Button>
-                                                }
-                                            </StyledTableCell>
-
-                                        </StyledTableRow>
-                                    )) : <div></div>}
-                            </TableBody>
-                        </Table>
-                    </TableContainer></>
-            }
-            {isModalOpen && (
-                <div className={style.modalOverlay} >
-                    <button className={style.closeButton} onClick={() => setIsModalOpen(false)}>
-                        ✕
-                    </button>
-                    <div className={style.modalContent}>
-
-                        {lodingImage ? <div className={style.imageContainer}>
-                            <img src={imageCert} alt="Certificado" className={style.modalImage} />
-
-                            {/* Nombre arrastrable */}
-                            <span
-                                id="name"
-                                style={{
-                                    position: "absolute",
-                                    top: `${namePosition.top}px`,
-                                    left: `${namePosition.left}px`,
-                                    fontSize: `${fontSize}px`,
-                                    fontFamily: fontFamily,
-                                    color: color,
-                                    fontStyle: isItalic ? "italic" : "normal",
-                                    background: "transparent",
-                                    padding: "5px",
-                                    cursor: "move",
-                                }}
-                            >
-                            </span>
-
-                            {/* Cédula arrastrable */}
-                            <span
-                                id="cedula"
-                                style={{
-                                    position: "absolute",
-                                    top: `${idPosition.top}px`,
-                                    left: `${idPosition.left}px`,
-                                    fontSize: `${fontSize}px`,
-                                    fontFamily: fontFamily,
-                                    color: color,
-                                    background: "transparent",
-                                    fontStyle: isItalic ? "italic" : "normal",
-                                    padding: "5px",
-                                    cursor: "move",
-                                }}
-                            >
-
-                            </span>
-                        </div> : <Loader ba={'transparent'} height={'530px'} color={'#156DF9'} load={2} />}
-                        <DownloadButton />
-                    </div>
-
-                </div>
-            )}
-
-        </>
-    );
+							{/* Footer con botón de descarga */}
+							<Box
+								sx={{
+									p: 2,
+									borderTop: `1px solid ${theme.palette.divider}`,
+									background: alpha(theme.palette.grey[50], 0.8),
+									display: "flex",
+									justifyContent: "center",
+								}}
+							>
+								<DownloadButton />
+							</Box>
+						</Box>
+					</Box>
+				</Fade>
+			</Modal>
+		</Box>
+	)
 }
