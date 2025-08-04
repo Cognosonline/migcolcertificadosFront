@@ -152,35 +152,35 @@ const Student = () => {
         localStorage.setItem("cetificate_data", JSON.stringify(res.data))
 
         setNameProperties({
-          fontSize: res.data.payload.fontsize,
-          fontFamily: res.data.payload.fontFamily,
-          color: res.data.payload.color,
-          isItalic: res.data.payload.italic,
-          isBold: res.data.payload.bold || false
+          fontSize: res.data.payload.nameFontSize || res.data.payload.fontsize,
+          fontFamily: res.data.payload.nameFontFamily || res.data.payload.fontFamily,
+          color: res.data.payload.nameColor || res.data.payload.color,
+          isItalic: res.data.payload.nameItalic !== undefined ? res.data.payload.nameItalic : res.data.payload.italic,
+          isBold: res.data.payload.nameBold !== undefined ? res.data.payload.nameBold : (res.data.payload.bold || false)
         })
         
         setIdProperties({
-          fontSize: res.data.payload.fontsize,
-          fontFamily: res.data.payload.fontFamily,
-          color: res.data.payload.color,
-          isItalic: res.data.payload.italic,
-          isBold: res.data.payload.bold || false
+          fontSize: res.data.payload.documentFontSize || res.data.payload.fontsize,
+          fontFamily: res.data.payload.documentFontFamily || res.data.payload.fontFamily,
+          color: res.data.payload.documentColor || res.data.payload.color,
+          isItalic: res.data.payload.documentItalic !== undefined ? res.data.payload.documentItalic : res.data.payload.italic,
+          isBold: res.data.payload.documentBold !== undefined ? res.data.payload.documentBold : (res.data.payload.bold || false)
         })
         
         setSignatureProperties({
-          fontSize: res.data.payload.fontsize,
-          fontFamily: res.data.payload.fontFamily,
-          color: res.data.payload.color,
-          isItalic: res.data.payload.italic,
-          isBold: res.data.payload.bold || false
+          fontSize: res.data.payload.signatureFontSize || res.data.payload.fontsize,
+          fontFamily: res.data.payload.signatureFontFamily || res.data.payload.fontFamily,
+          color: res.data.payload.signatureColor || res.data.payload.color,
+          isItalic: res.data.payload.signatureItalic !== undefined ? res.data.payload.signatureItalic : res.data.payload.italic,
+          isBold: res.data.payload.signatureBold !== undefined ? res.data.payload.signatureBold : (res.data.payload.bold || false)
         })
         
         setCreatedAtProperties({
-          fontSize: res.data.payload.fontsize,
-          fontFamily: res.data.payload.fontFamily,
-          color: res.data.payload.color,
-          isItalic: res.data.payload.italic,
-          isBold: res.data.payload.bold || false
+          fontSize: res.data.payload.createdAtFontSize || res.data.payload.fontsize,
+          fontFamily: res.data.payload.createdAtFontFamily || res.data.payload.fontFamily,
+          color: res.data.payload.createdAtColor || res.data.payload.color,
+          isItalic: res.data.payload.createdAtItalic !== undefined ? res.data.payload.createdAtItalic : res.data.payload.italic,
+          isBold: res.data.payload.createdAtBold !== undefined ? res.data.payload.createdAtBold : (res.data.payload.bold || false)
         })
         
         setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
@@ -489,7 +489,9 @@ const Student = () => {
                 letterSpacing: "0.5px",
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
-            />
+            >
+              {user?.name?.toUpperCase() || "NOMBRE DEL ESTUDIANTE"}
+            </span>
 
             {/* Cédula - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
             <span
@@ -509,7 +511,9 @@ const Student = () => {
                 letterSpacing: "0.5px",
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
-            />
+            >
+              {user?.externalId || "ID DEL ESTUDIANTE"}
+            </span>
 
             {/* Firma - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
             <span
@@ -530,7 +534,7 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {"Firma Digital"}
+              {user?.signature || "Firma Digital"}
             </span>
 
             {/* Fecha - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
@@ -552,7 +556,7 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {new Date().toLocaleDateString()}
+              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
             </span>
           </Box>
         </Box>

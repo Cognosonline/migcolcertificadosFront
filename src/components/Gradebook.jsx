@@ -149,10 +149,16 @@ export default function GradeBook({
 	const positionDataCertificate = (row) => {
 		const name = document.getElementById("name")
 		const cedula = document.getElementById("cedula")
+		const signature = document.getElementById("signature")
+		const createdAt = document.getElementById("createdAt")
 		
 		// Simplemente aplicar el contenido sin modificar posiciones
 		name.innerHTML = row.user.name.toUpperCase()
 		cedula.innerHTML = row.user.externalId
+		
+		// Aplicar datos reales para firma y fecha con validación y placeholders
+		signature.innerHTML = row.user.signature || "Firma Digital"
+		createdAt.innerHTML = row.user.createdAt ? new Date(row.user.createdAt).toLocaleDateString() : new Date().toLocaleDateString()
 
 		// Debug: Verificar estilos aplicados
 		// console.log("Name element styles:", {
@@ -798,7 +804,7 @@ export default function GradeBook({
 													transform: "translate(-50%, 0)", // Centrar horizontalmente
 												}}
 											>
-												{"<<Firma>>"}
+												{"Firma Digital"}
 											</span>
 											<span
 												className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}
@@ -820,7 +826,7 @@ export default function GradeBook({
 													transform: "translate(-50%, 0)", // Centrar horizontalmente
 												}}
 											>
-												{"<<Fecha>>"}
+												{new Date().toLocaleDateString()}
 											</span>
 										</>
 									) : (

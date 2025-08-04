@@ -278,30 +278,31 @@ const InfoCourse = ({
 
 				if (dataCertificate) {
 					if (dataCertificate.payload.courseId === course.course.courseId) {
-						// Configurar propiedades para todos los elementos basándose en los datos guardados
-						updateNameProperty('color', dataCertificate.payload.color)
-						updateNameProperty('fontFamily', dataCertificate.payload.fontFamily)
-						updateNameProperty('fontSize', dataCertificate.payload.fontsize)
-						updateNameProperty('isItalic', dataCertificate.payload.italic)
-						updateNameProperty('isBold', dataCertificate.payload.bold || false)
+						// Configurar propiedades individuales basándose en los datos guardados
+						// Si existen propiedades individuales, usarlas; si no, usar las globales como fallback
+						updateNameProperty('color', dataCertificate.payload.nameColor || dataCertificate.payload.color)
+						updateNameProperty('fontFamily', dataCertificate.payload.nameFontFamily || dataCertificate.payload.fontFamily)
+						updateNameProperty('fontSize', dataCertificate.payload.nameFontSize || dataCertificate.payload.fontsize)
+						updateNameProperty('isItalic', dataCertificate.payload.nameItalic !== undefined ? dataCertificate.payload.nameItalic : dataCertificate.payload.italic)
+						updateNameProperty('isBold', dataCertificate.payload.nameBold !== undefined ? dataCertificate.payload.nameBold : (dataCertificate.payload.bold || false))
 						
-						updateIdProperty('color', dataCertificate.payload.color)
-						updateIdProperty('fontFamily', dataCertificate.payload.fontFamily)
-						updateIdProperty('fontSize', dataCertificate.payload.fontsize)
-						updateIdProperty('isItalic', dataCertificate.payload.italic)
-						updateIdProperty('isBold', dataCertificate.payload.bold || false)
+						updateIdProperty('color', dataCertificate.payload.documentColor || dataCertificate.payload.color)
+						updateIdProperty('fontFamily', dataCertificate.payload.documentFontFamily || dataCertificate.payload.fontFamily)
+						updateIdProperty('fontSize', dataCertificate.payload.documentFontSize || dataCertificate.payload.fontsize)
+						updateIdProperty('isItalic', dataCertificate.payload.documentItalic !== undefined ? dataCertificate.payload.documentItalic : dataCertificate.payload.italic)
+						updateIdProperty('isBold', dataCertificate.payload.documentBold !== undefined ? dataCertificate.payload.documentBold : (dataCertificate.payload.bold || false))
 						
-						updateSignatureProperty('color', dataCertificate.payload.color)
-						updateSignatureProperty('fontFamily', dataCertificate.payload.fontFamily)
-						updateSignatureProperty('fontSize', dataCertificate.payload.fontsize)
-						updateSignatureProperty('isItalic', dataCertificate.payload.italic)
-						updateSignatureProperty('isBold', dataCertificate.payload.bold || false)
+						updateSignatureProperty('color', dataCertificate.payload.signatureColor || dataCertificate.payload.color)
+						updateSignatureProperty('fontFamily', dataCertificate.payload.signatureFontFamily || dataCertificate.payload.fontFamily)
+						updateSignatureProperty('fontSize', dataCertificate.payload.signatureFontSize || dataCertificate.payload.fontsize)
+						updateSignatureProperty('isItalic', dataCertificate.payload.signatureItalic !== undefined ? dataCertificate.payload.signatureItalic : dataCertificate.payload.italic)
+						updateSignatureProperty('isBold', dataCertificate.payload.signatureBold !== undefined ? dataCertificate.payload.signatureBold : (dataCertificate.payload.bold || false))
 						
-						updateCreatedAtProperty('color', dataCertificate.payload.color)
-						updateCreatedAtProperty('fontFamily', dataCertificate.payload.fontFamily)
-						updateCreatedAtProperty('fontSize', dataCertificate.payload.fontsize)
-						updateCreatedAtProperty('isItalic', dataCertificate.payload.italic)
-						updateCreatedAtProperty('isBold', dataCertificate.payload.bold || false)
+						updateCreatedAtProperty('color', dataCertificate.payload.createdAtColor || dataCertificate.payload.color)
+						updateCreatedAtProperty('fontFamily', dataCertificate.payload.createdAtFontFamily || dataCertificate.payload.fontFamily)
+						updateCreatedAtProperty('fontSize', dataCertificate.payload.createdAtFontSize || dataCertificate.payload.fontsize)
+						updateCreatedAtProperty('isItalic', dataCertificate.payload.createdAtItalic !== undefined ? dataCertificate.payload.createdAtItalic : dataCertificate.payload.italic)
+						updateCreatedAtProperty('isBold', dataCertificate.payload.createdAtBold !== undefined ? dataCertificate.payload.createdAtBold : (dataCertificate.payload.bold || false))
 						
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
@@ -326,30 +327,31 @@ const InfoCourse = ({
 						setIslodingInfo(true)
 					}
 
-					// Configurar propiedades para todos los elementos basándose en los datos de la API
-					updateNameProperty('color', res.data.payload.color)
-					updateNameProperty('fontFamily', res.data.payload.fontFamily)
-					updateNameProperty('fontSize', res.data.payload.fontsize)
-					updateNameProperty('isItalic', res.data.payload.italic)
-					updateNameProperty('isBold', res.data.payload.bold || false)
+					// Configurar propiedades individuales basándose en los datos de la API
+					// Si existen propiedades individuales, usarlas; si no, usar las globales como fallback
+					updateNameProperty('color', res.data.payload.nameColor || res.data.payload.color)
+					updateNameProperty('fontFamily', res.data.payload.nameFontFamily || res.data.payload.fontFamily)
+					updateNameProperty('fontSize', res.data.payload.nameFontSize || res.data.payload.fontsize)
+					updateNameProperty('isItalic', res.data.payload.nameItalic !== undefined ? res.data.payload.nameItalic : res.data.payload.italic)
+					updateNameProperty('isBold', res.data.payload.nameBold !== undefined ? res.data.payload.nameBold : (res.data.payload.bold || false))
 					
-					updateIdProperty('color', res.data.payload.color)
-					updateIdProperty('fontFamily', res.data.payload.fontFamily)
-					updateIdProperty('fontSize', res.data.payload.fontsize)
-					updateIdProperty('isItalic', res.data.payload.italic)
-					updateIdProperty('isBold', res.data.payload.bold || false)
+					updateIdProperty('color', res.data.payload.documentColor || res.data.payload.color)
+					updateIdProperty('fontFamily', res.data.payload.documentFontFamily || res.data.payload.fontFamily)
+					updateIdProperty('fontSize', res.data.payload.documentFontSize || res.data.payload.fontsize)
+					updateIdProperty('isItalic', res.data.payload.documentItalic !== undefined ? res.data.payload.documentItalic : res.data.payload.italic)
+					updateIdProperty('isBold', res.data.payload.documentBold !== undefined ? res.data.payload.documentBold : (res.data.payload.bold || false))
 					
-					updateSignatureProperty('color', res.data.payload.color)
-					updateSignatureProperty('fontFamily', res.data.payload.fontFamily)
-					updateSignatureProperty('fontSize', res.data.payload.fontsize)
-					updateSignatureProperty('isItalic', res.data.payload.italic)
-					updateSignatureProperty('isBold', res.data.payload.bold || false)
+					updateSignatureProperty('color', res.data.payload.signatureColor || res.data.payload.color)
+					updateSignatureProperty('fontFamily', res.data.payload.signatureFontFamily || res.data.payload.fontFamily)
+					updateSignatureProperty('fontSize', res.data.payload.signatureFontSize || res.data.payload.fontsize)
+					updateSignatureProperty('isItalic', res.data.payload.signatureItalic !== undefined ? res.data.payload.signatureItalic : res.data.payload.italic)
+					updateSignatureProperty('isBold', res.data.payload.signatureBold !== undefined ? res.data.payload.signatureBold : (res.data.payload.bold || false))
 					
-					updateCreatedAtProperty('color', res.data.payload.color)
-					updateCreatedAtProperty('fontFamily', res.data.payload.fontFamily)
-					updateCreatedAtProperty('fontSize', res.data.payload.fontsize)
-					updateCreatedAtProperty('isItalic', res.data.payload.italic)
-					updateCreatedAtProperty('isBold', res.data.payload.bold || false)
+					updateCreatedAtProperty('color', res.data.payload.createdAtColor || res.data.payload.color)
+					updateCreatedAtProperty('fontFamily', res.data.payload.createdAtFontFamily || res.data.payload.fontFamily)
+					updateCreatedAtProperty('fontSize', res.data.payload.createdAtFontSize || res.data.payload.fontsize)
+					updateCreatedAtProperty('isItalic', res.data.payload.createdAtItalic !== undefined ? res.data.payload.createdAtItalic : res.data.payload.italic)
+					updateCreatedAtProperty('isBold', res.data.payload.createdAtBold !== undefined ? res.data.payload.createdAtBold : (res.data.payload.bold || false))
 					
 					setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
 					setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
@@ -878,14 +880,24 @@ const InfoCourse = ({
 											currentProperties={currentProperties}
 											updateCurrentProperty={updateCurrentProperty}
 											
+											// Propiedades individuales
+											nameProperties={nameProperties}
+											idProperties={idProperties}
+											signatureProperties={signatureProperties}
+											createdAtProperties={createdAtProperties}
+											
+											// Posiciones
+											namePosition={namePosition}
+											idPosition={idPosition}
+											signaturePosition={signaturePosition}
+											createdAtPosition={createdAtPosition}
+											
 											// Props existentes que no cambian
 											setLodiangImage={setLodiangImage}
 											courseId={course.course.courseId}
 											setValidateCert={setValidateCert}
 											setImageCert={setImageCert}
 											setIsModalOpen={setIsModalOpen}
-											namePosition={namePosition}
-											idPosition={idPosition}
 											toolView={toolView}
 											setToolView={setToolView}
 											setBackgroundsp={setBackgroundSp}
