@@ -13,6 +13,10 @@ const Toolbar = ({
   currentProperties,
   updateCurrentProperty,
   
+  // Propiedades individuales para guardar ambas
+  nameProperties,
+  idProperties,
+  
   // Props existentes que no cambian
   setLodiangImage,
   courseId,
@@ -72,7 +76,17 @@ const Toolbar = ({
         }
       });
 
-      localStorage.setItem('cetificate_data', JSON.stringify(res.data));
+      // Crear un objeto con propiedades individuales para localStorage
+      const certificateDataWithIndividualProps = {
+        ...res.data,
+        payload: {
+          ...res.data.payload,
+          nameProperties: nameProperties,
+          idProperties: idProperties
+        }
+      };
+
+      localStorage.setItem('cetificate_data', JSON.stringify(certificateDataWithIndividualProps));
 
       setLodiangImage(true)
     } catch (error) {
