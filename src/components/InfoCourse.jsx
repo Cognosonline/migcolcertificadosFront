@@ -42,18 +42,25 @@ import html2canvas from "html2canvas"
 import Toolbar from "./Toolbar"
 
 const InfoCourse = ({
-	fontSize,
-	setFontSize,
-	fontFamily,
-	setFontFamily,
-	color,
-	setColor,
-	isItalic,
-	setIsItalic,
+	// Elemento seleccionado y sus propiedades
+	selectedElement,
+	setSelectedElement,
+	currentProperties,
+	updateCurrentProperty,
+	
+	// Propiedades individuales
+	nameProperties,
+	idProperties,
+	updateNameProperty,
+	updateIdProperty,
+	
+	// Posiciones
 	namePosition,
 	setNamePosition,
 	idPosition,
 	setIdPosition,
+	
+	// Otros estados
 	imageCert,
 	setImageCert,
 	reqScore,
@@ -186,10 +193,18 @@ const InfoCourse = ({
 			if (data) {
 				const res = await api.get(`/certificateCourse/${course.course.courseId}`)
 
-				setColor(res.data.payload.color)
-				setFontFamily(res.data.payload.fontFamily)
-				setFontSize(res.data.payload.fontsize)
-				setIsItalic(res.data.payload.italic)
+				// Configurar propiedades para ambos elementos basándose en los datos de la API
+				updateNameProperty('color', res.data.payload.color)
+				updateNameProperty('fontFamily', res.data.payload.fontFamily)
+				updateNameProperty('fontSize', res.data.payload.fontsize)
+				updateNameProperty('isItalic', res.data.payload.italic)
+				updateNameProperty('isBold', res.data.payload.bold || false)
+				
+				updateIdProperty('color', res.data.payload.color)
+				updateIdProperty('fontFamily', res.data.payload.fontFamily)
+				updateIdProperty('fontSize', res.data.payload.fontsize)
+				updateIdProperty('isItalic', res.data.payload.italic)
+				updateIdProperty('isBold', res.data.payload.bold || false)
 
 				if (!res.data.payload.fileName == "") {
 					const resCert = await api.get(`/certificate/${res.data.payload.fileName}`)
@@ -247,10 +262,19 @@ const InfoCourse = ({
 
 				if (dataCertificate) {
 					if (dataCertificate.payload.courseId === course.course.courseId) {
-						setColor(dataCertificate.payload.color)
-						setFontFamily(dataCertificate.payload.fontFamily)
-						setFontSize(dataCertificate.payload.fontsize)
-						setIsItalic(dataCertificate.payload.italic)
+						// Configurar propiedades para ambos elementos basándose en los datos guardados
+						updateNameProperty('color', dataCertificate.payload.color)
+						updateNameProperty('fontFamily', dataCertificate.payload.fontFamily)
+						updateNameProperty('fontSize', dataCertificate.payload.fontsize)
+						updateNameProperty('isItalic', dataCertificate.payload.italic)
+						updateNameProperty('isBold', dataCertificate.payload.bold || false)
+						
+						updateIdProperty('color', dataCertificate.payload.color)
+						updateIdProperty('fontFamily', dataCertificate.payload.fontFamily)
+						updateIdProperty('fontSize', dataCertificate.payload.fontsize)
+						updateIdProperty('isItalic', dataCertificate.payload.italic)
+						updateIdProperty('isBold', dataCertificate.payload.bold || false)
+						
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
 
@@ -272,10 +296,19 @@ const InfoCourse = ({
 						setIslodingInfo(true)
 					}
 
-					setColor(res.data.payload.color)
-					setFontFamily(res.data.payload.fontFamily)
-					setFontSize(res.data.payload.fontsize)
-					setIsItalic(res.data.payload.italic)
+					// Configurar propiedades para ambos elementos basándose en los datos de la API
+					updateNameProperty('color', res.data.payload.color)
+					updateNameProperty('fontFamily', res.data.payload.fontFamily)
+					updateNameProperty('fontSize', res.data.payload.fontsize)
+					updateNameProperty('isItalic', res.data.payload.italic)
+					updateNameProperty('isBold', res.data.payload.bold || false)
+					
+					updateIdProperty('color', res.data.payload.color)
+					updateIdProperty('fontFamily', res.data.payload.fontFamily)
+					updateIdProperty('fontSize', res.data.payload.fontsize)
+					updateIdProperty('isItalic', res.data.payload.italic)
+					updateIdProperty('isBold', res.data.payload.bold || false)
+					
 					setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
 					setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
 
@@ -795,14 +828,13 @@ const InfoCourse = ({
 									{/* Toolbar minimalista */}
 									<Box sx={{ borderBottom: `1px solid ${theme.palette.divider}`, p: 1 }}>
 										<Toolbar
-											fontSize={fontSize}
-											setFontSize={setFontSize}
-											fontFamily={fontFamily}
-											setFontFamily={setFontFamily}
-											color={color}
-											setColor={setColor}
-											isItalic={isItalic}
-											setIsItalic={setIsItalic}
+											// Elemento seleccionado y sus propiedades
+											selectedElement={selectedElement}
+											setSelectedElement={setSelectedElement}
+											currentProperties={currentProperties}
+											updateCurrentProperty={updateCurrentProperty}
+											
+											// Props existentes que no cambian
 											setLodiangImage={setLodiangImage}
 											courseId={course.course.courseId}
 											setValidateCert={setValidateCert}
@@ -866,16 +898,18 @@ const InfoCourse = ({
 														className={`draggableLabel ${draggingElement === "name" ? "dragging" : ""}`}
 														onMouseDown={(e) => handleMouseDown(e, "name")}
 														onTouchStart={(e) => handleTouchStart(e, "name")}
+														onClick={() => setSelectedElement("name")}
 														style={{
 															position: "absolute",
 															top: `${namePosition.top}px`,
 															left: `${namePosition.left}px`,
-															fontSize: `${fontSize}px`,
-															fontFamily: fontFamily,
-															color: color,
-															fontStyle: isItalic ? "italic" : "normal",
-															background: backgroundSp ? "transparent" : "#e9e5e5b9",
-															border: draggingElement === "name" ? "2px solid rgb(17, 182, 211)" : "none",
+															fontSize: `${nameProperties.fontSize}px`,
+															fontFamily: nameProperties.fontFamily,
+															color: nameProperties.color,
+															fontStyle: nameProperties.isItalic ? "italic" : "normal",
+															fontWeight: nameProperties.isBold ? "bold" : "normal",
+															background: backgroundSp ? "transparent" : selectedElement === "name" ? "#d1ecf1" : "#e9e5e5b9",
+															border: draggingElement === "name" ? "2px solid rgb(17, 182, 211)" : selectedElement === "name" ? "2px solid #007bff" : "none",
 															padding: "5px",
 															cursor: "move",
 															userSelect: "none",
@@ -888,18 +922,20 @@ const InfoCourse = ({
 														className={`draggableLabel ${draggingElement === "id" ? "dragging" : ""}`}
 														onMouseDown={(e) => handleMouseDown(e, "id")}
 														onTouchStart={(e) => handleTouchStart(e, "id")}
+														onClick={() => setSelectedElement("id")}
 														style={{
 															position: "absolute",
 															top: `${idPosition.top}px`,
 															left: `${idPosition.left}px`,
-															fontSize: `${fontSize}px`,
-															fontFamily: fontFamily,
-															color: color,
-															fontStyle: isItalic ? "italic" : "normal",
-															border: draggingElement === "id" ? "2px solid #ff6600" : "none",
+															fontSize: `${idProperties.fontSize}px`,
+															fontFamily: idProperties.fontFamily,
+															color: idProperties.color,
+															fontStyle: idProperties.isItalic ? "italic" : "normal",
+															fontWeight: idProperties.isBold ? "bold" : "normal",
+															border: draggingElement === "id" ? "2px solid #ff6600" : selectedElement === "id" ? "2px solid #007bff" : "none",
 															padding: "5px",
 															cursor: "move",
-															background: backgroundSp ? "transparent" : "#e9e5e5b9",
+															background: backgroundSp ? "transparent" : selectedElement === "id" ? "#d1ecf1" : "#e9e5e5b9",
 															userSelect: "none",
 															transform: "translate(-50%, 0)", // Centrar horizontalmente
 														}}
