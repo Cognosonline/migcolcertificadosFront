@@ -51,14 +51,22 @@ const InfoCourse = ({
 	// Propiedades individuales
 	nameProperties,
 	idProperties,
+	signatureProperties,
+	createdAtProperties,
 	updateNameProperty,
 	updateIdProperty,
+	updateSignatureProperty,
+	updateCreatedAtProperty,
 	
 	// Posiciones
 	namePosition,
 	setNamePosition,
 	idPosition,
 	setIdPosition,
+	signaturePosition,
+	setSignaturePosition,
+	createdAtPosition,
+	setCreatedAtPosition,
 	
 	// Otros estados
 	imageCert,
@@ -106,6 +114,10 @@ const InfoCourse = ({
 				setNamePosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "id") {
 				setIdPosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "signature") {
+				setSignaturePosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "createdAt") {
+				setCreatedAtPosition({ top: deltaY, left: deltaX })
 			}
 		}
 	}
@@ -135,6 +147,10 @@ const InfoCourse = ({
 				setNamePosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "id") {
 				setIdPosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "signature") {
+				setSignaturePosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "createdAt") {
+				setCreatedAtPosition({ top: deltaY, left: deltaX })
 			}
 		}
 	}
@@ -262,7 +278,7 @@ const InfoCourse = ({
 
 				if (dataCertificate) {
 					if (dataCertificate.payload.courseId === course.course.courseId) {
-						// Configurar propiedades para ambos elementos basándose en los datos guardados
+						// Configurar propiedades para todos los elementos basándose en los datos guardados
 						updateNameProperty('color', dataCertificate.payload.color)
 						updateNameProperty('fontFamily', dataCertificate.payload.fontFamily)
 						updateNameProperty('fontSize', dataCertificate.payload.fontsize)
@@ -275,8 +291,22 @@ const InfoCourse = ({
 						updateIdProperty('isItalic', dataCertificate.payload.italic)
 						updateIdProperty('isBold', dataCertificate.payload.bold || false)
 						
+						updateSignatureProperty('color', dataCertificate.payload.color)
+						updateSignatureProperty('fontFamily', dataCertificate.payload.fontFamily)
+						updateSignatureProperty('fontSize', dataCertificate.payload.fontsize)
+						updateSignatureProperty('isItalic', dataCertificate.payload.italic)
+						updateSignatureProperty('isBold', dataCertificate.payload.bold || false)
+						
+						updateCreatedAtProperty('color', dataCertificate.payload.color)
+						updateCreatedAtProperty('fontFamily', dataCertificate.payload.fontFamily)
+						updateCreatedAtProperty('fontSize', dataCertificate.payload.fontsize)
+						updateCreatedAtProperty('isItalic', dataCertificate.payload.italic)
+						updateCreatedAtProperty('isBold', dataCertificate.payload.bold || false)
+						
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
+						setSignaturePosition({ top: dataCertificate.payload.signatureY || 300, left: dataCertificate.payload.signatureX || 450 })
+						setCreatedAtPosition({ top: dataCertificate.payload.createdAtY || 350, left: dataCertificate.payload.createdAtX || 450 })
 
 						if (dataCertificate.payload.reqScore != 0) {
 							setIsSaved(true)
@@ -296,7 +326,7 @@ const InfoCourse = ({
 						setIslodingInfo(true)
 					}
 
-					// Configurar propiedades para ambos elementos basándose en los datos de la API
+					// Configurar propiedades para todos los elementos basándose en los datos de la API
 					updateNameProperty('color', res.data.payload.color)
 					updateNameProperty('fontFamily', res.data.payload.fontFamily)
 					updateNameProperty('fontSize', res.data.payload.fontsize)
@@ -309,8 +339,22 @@ const InfoCourse = ({
 					updateIdProperty('isItalic', res.data.payload.italic)
 					updateIdProperty('isBold', res.data.payload.bold || false)
 					
+					updateSignatureProperty('color', res.data.payload.color)
+					updateSignatureProperty('fontFamily', res.data.payload.fontFamily)
+					updateSignatureProperty('fontSize', res.data.payload.fontsize)
+					updateSignatureProperty('isItalic', res.data.payload.italic)
+					updateSignatureProperty('isBold', res.data.payload.bold || false)
+					
+					updateCreatedAtProperty('color', res.data.payload.color)
+					updateCreatedAtProperty('fontFamily', res.data.payload.fontFamily)
+					updateCreatedAtProperty('fontSize', res.data.payload.fontsize)
+					updateCreatedAtProperty('isItalic', res.data.payload.italic)
+					updateCreatedAtProperty('isBold', res.data.payload.bold || false)
+					
 					setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
 					setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
+					setSignaturePosition({ top: res.data.payload.signatureY || 300, left: res.data.payload.signatureX || 450 })
+					setCreatedAtPosition({ top: res.data.payload.createdAtY || 350, left: res.data.payload.createdAtX || 450 })
 
 					if (res.data.payload.reqScore != 0) {
 						setIsSaved(true)
@@ -941,6 +985,54 @@ const InfoCourse = ({
 														}}
 													>
 														{"1000000000"}
+													</span>
+													<span
+														className={`draggableLabel ${draggingElement === "signature" ? "dragging" : ""}`}
+														onMouseDown={(e) => handleMouseDown(e, "signature")}
+														onTouchStart={(e) => handleTouchStart(e, "signature")}
+														onClick={() => setSelectedElement("signature")}
+														style={{
+															position: "absolute",
+															top: `${signaturePosition.top}px`,
+															left: `${signaturePosition.left}px`,
+															fontSize: `${signatureProperties.fontSize}px`,
+															fontFamily: signatureProperties.fontFamily,
+															color: signatureProperties.color,
+															fontStyle: signatureProperties.isItalic ? "italic" : "normal",
+															fontWeight: signatureProperties.isBold ? "bold" : "normal",
+															border: draggingElement === "signature" ? "2px solid #ff6600" : selectedElement === "signature" ? "2px solid #007bff" : "none",
+															padding: "5px",
+															cursor: "move",
+															background: backgroundSp ? "transparent" : selectedElement === "signature" ? "#d1ecf1" : "#e9e5e5b9",
+															userSelect: "none",
+															transform: "translate(-50%, 0)", // Centrar horizontalmente
+														}}
+													>
+														{"<<Firma>>"}
+													</span>
+													<span
+														className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}
+														onMouseDown={(e) => handleMouseDown(e, "createdAt")}
+														onTouchStart={(e) => handleTouchStart(e, "createdAt")}
+														onClick={() => setSelectedElement("createdAt")}
+														style={{
+															position: "absolute",
+															top: `${createdAtPosition.top}px`,
+															left: `${createdAtPosition.left}px`,
+															fontSize: `${createdAtProperties.fontSize}px`,
+															fontFamily: createdAtProperties.fontFamily,
+															color: createdAtProperties.color,
+															fontStyle: createdAtProperties.isItalic ? "italic" : "normal",
+															fontWeight: createdAtProperties.isBold ? "bold" : "normal",
+															border: draggingElement === "createdAt" ? "2px solid #ff6600" : selectedElement === "createdAt" ? "2px solid #007bff" : "none",
+															padding: "5px",
+															cursor: "move",
+															background: backgroundSp ? "transparent" : selectedElement === "createdAt" ? "#d1ecf1" : "#e9e5e5b9",
+															userSelect: "none",
+															transform: "translate(-50%, 0)", // Centrar horizontalmente
+														}}
+													>
+														{"<<Fecha>>"}
 													</span>
 												</>
 											) : (

@@ -93,6 +93,8 @@ const Toolbar = ({
         <select value={selectedElement} onChange={(e) => setSelectedElement(e.target.value)} className={style.toolbarSelect}>
           <option value="name">Nombre</option>
           <option value="id">Cédula</option>
+          <option value="signature">Firma</option>
+          <option value="createdAt">Fecha</option>
         </select>
 
         <label className={style.toolbarLabel}>Tamaño:</label>

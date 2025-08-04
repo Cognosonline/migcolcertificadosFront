@@ -94,8 +94,12 @@ const GradeChip = styled(Chip)(({ theme, passed }) => ({
 export default function GradeBook({
 	nameProperties,
 	idProperties,
+	signatureProperties,
+	createdAtProperties,
 	namePosition,
 	idPosition,
+	signaturePosition,
+	createdAtPosition,
 	imageCert,
 	reqScore,
 }) {
@@ -774,6 +778,50 @@ export default function GradeBook({
 													transform: "translate(-50%, 0)", // Centrar horizontalmente
 												}}
 											/>
+											<span
+												className={`draggableLabel ${draggingElement === "signature" ? "dragging" : ""}`}
+												id="signature"
+												onMouseDown={(e) => handleMouseDown(e, "signature")}
+												style={{
+													position: "absolute",
+													top: `${signaturePosition.top}px`,
+													left: `${signaturePosition.left}px`,
+													fontSize: `${signatureProperties.fontSize}px`,
+													fontFamily: signatureProperties.fontFamily,
+													color: signatureProperties.color,
+													background: "transparent",
+													fontStyle: signatureProperties.isItalic ? "italic" : "normal",
+													fontWeight: signatureProperties.isBold ? "bold" : "normal",
+													padding: "5px",
+													cursor: "move",
+													userSelect: "none",
+													transform: "translate(-50%, 0)", // Centrar horizontalmente
+												}}
+											>
+												{"<<Firma>>"}
+											</span>
+											<span
+												className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}
+												id="createdAt"
+												onMouseDown={(e) => handleMouseDown(e, "createdAt")}
+												style={{
+													position: "absolute",
+													top: `${createdAtPosition.top}px`,
+													left: `${createdAtPosition.left}px`,
+													fontSize: `${createdAtProperties.fontSize}px`,
+													fontFamily: createdAtProperties.fontFamily,
+													color: createdAtProperties.color,
+													background: "transparent",
+													fontStyle: createdAtProperties.isItalic ? "italic" : "normal",
+													fontWeight: createdAtProperties.isBold ? "bold" : "normal",
+													padding: "5px",
+													cursor: "move",
+													userSelect: "none",
+													transform: "translate(-50%, 0)", // Centrar horizontalmente
+												}}
+											>
+												{"<<Fecha>>"}
+											</span>
 										</>
 									) : (
 										<Box

@@ -32,9 +32,29 @@ const Student = () => {
     isBold: false,
   })
   
+  // Propiedades de la firma
+  const [signatureProperties, setSignatureProperties] = useState({
+    fontSize: 16,
+    fontFamily: "Arial",
+    color: "#000000",
+    isItalic: false,
+    isBold: false,
+  })
+  
+  // Propiedades de la fecha
+  const [createdAtProperties, setCreatedAtProperties] = useState({
+    fontSize: 16,
+    fontFamily: "Arial",
+    color: "#000000",
+    isItalic: false,
+    isBold: false,
+  })
+  
   // Posiciones
   const [namePosition, setNamePosition] = useState({ top: 100, left: 100 })
   const [idPosition, setIdPosition] = useState({ top: 200, left: 100 })
+  const [signaturePosition, setSignaturePosition] = useState({ top: 300, left: 100 })
+  const [createdAtPosition, setCreatedAtPosition] = useState({ top: 350, left: 100 })
   const [imageCert, setImageCert] = useState(null)
   const [imageLoad, setImageLoad] = useState(false)
   const [isDownloading, setIsDownloading] = useState(false)
@@ -146,8 +166,27 @@ const Student = () => {
           isItalic: res.data.payload.italic,
           isBold: res.data.payload.bold || false
         })
+        
+        setSignatureProperties({
+          fontSize: res.data.payload.fontsize,
+          fontFamily: res.data.payload.fontFamily,
+          color: res.data.payload.color,
+          isItalic: res.data.payload.italic,
+          isBold: res.data.payload.bold || false
+        })
+        
+        setCreatedAtProperties({
+          fontSize: res.data.payload.fontsize,
+          fontFamily: res.data.payload.fontFamily,
+          color: res.data.payload.color,
+          isItalic: res.data.payload.italic,
+          isBold: res.data.payload.bold || false
+        })
+        
         setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
         setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
+        setSignaturePosition({ top: res.data.payload.signatureY || 300, left: res.data.payload.signatureX || 450 })
+        setCreatedAtPosition({ top: res.data.payload.createdAtY || 350, left: res.data.payload.createdAtX || 450 })
 
         if (!res.data.payload.fileName == "") {
           const resCert = await api.get(`/certificate/${res.data.payload.fileName}`)
@@ -471,6 +510,50 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             />
+
+            {/* Firma - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
+            <span
+              id="signature"
+              style={{
+                position: "absolute",
+                top: `${signaturePosition.top}px`,
+                left: `${signaturePosition.left}px`,
+                fontSize: `${signatureProperties.fontSize}px`,
+                fontFamily: signatureProperties.fontFamily,
+                color: signatureProperties.color,
+                fontStyle: signatureProperties.isItalic ? "italic" : "normal",
+                fontWeight: signatureProperties.isBold ? "bold" : 600,
+                background: "transparent",
+                padding: "5px", // PADDING ORIGINAL EXACTO
+                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                letterSpacing: "0.5px",
+                transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
+              }}
+            >
+              {"Firma Digital"}
+            </span>
+
+            {/* Fecha - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
+            <span
+              id="createdAt"
+              style={{
+                position: "absolute",
+                top: `${createdAtPosition.top}px`,
+                left: `${createdAtPosition.left}px`,
+                fontSize: `${createdAtProperties.fontSize}px`,
+                fontFamily: createdAtProperties.fontFamily,
+                color: createdAtProperties.color,
+                fontStyle: createdAtProperties.isItalic ? "italic" : "normal",
+                fontWeight: createdAtProperties.isBold ? "bold" : 600,
+                background: "transparent",
+                padding: "5px", // PADDING ORIGINAL EXACTO
+                textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                letterSpacing: "0.5px",
+                transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
+              }}
+            >
+              {new Date().toLocaleDateString()}
+            </span>
           </Box>
         </Box>
       </Fade>

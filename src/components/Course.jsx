@@ -30,7 +30,7 @@ import Gradebook from "./Gradebook"
 
 const Course = () => {
 	// Estados individuales para cada elemento
-	const [selectedElement, setSelectedElement] = useState("name") // "name" o "id"
+	const [selectedElement, setSelectedElement] = useState("name") // "name", "id", "signature" o "createdAt"
 	
 	// Propiedades del nombre
 	const [nameProperties, setNameProperties] = useState({
@@ -50,9 +50,29 @@ const Course = () => {
 		isBold: false,
 	})
 	
+	// Propiedades de la firma
+	const [signatureProperties, setSignatureProperties] = useState({
+		fontSize: 14,
+		fontFamily: "Arial",
+		color: "#000000",
+		isItalic: true,
+		isBold: false,
+	})
+	
+	// Propiedades de la fecha de creación
+	const [createdAtProperties, setCreatedAtProperties] = useState({
+		fontSize: 12,
+		fontFamily: "Arial",
+		color: "#666666",
+		isItalic: false,
+		isBold: false,
+	})
+	
 	// Posiciones (se mantienen separadas)
 	const [namePosition, setNamePosition] = useState({ top: 200, left: 100 })
 	const [idPosition, setIdPosition] = useState({ top: 250, left: 100 })
+	const [signaturePosition, setSignaturePosition] = useState({ top: 400, left: 150 })
+	const [createdAtPosition, setCreatedAtPosition] = useState({ top: 450, left: 150 })
 	const [imageCert, setImageCert] = useState(null)
 	const [reqScore, setReqScore] = useState(null)
 	const [lodignGrade, setLodingGrade] = useState(false)
@@ -72,17 +92,46 @@ const Course = () => {
 		}))
 	}
 
+	const updateSignatureProperty = (property, value) => {
+		setSignatureProperties(prev => ({
+			...prev,
+			[property]: value
+		}))
+	}
+
+	const updateCreatedAtProperty = (property, value) => {
+		setCreatedAtProperties(prev => ({
+			...prev,
+			[property]: value
+		}))
+	}
+
 	// Función para obtener las propiedades del elemento seleccionado
 	const getCurrentProperties = () => {
-		return selectedElement === "name" ? nameProperties : idProperties
+		switch (selectedElement) {
+			case "name": return nameProperties
+			case "id": return idProperties
+			case "signature": return signatureProperties
+			case "createdAt": return createdAtProperties
+			default: return nameProperties
+		}
 	}
 
 	// Función para actualizar propiedades del elemento seleccionado
 	const updateCurrentProperty = (property, value) => {
-		if (selectedElement === "name") {
-			updateNameProperty(property, value)
-		} else {
-			updateIdProperty(property, value)
+		switch (selectedElement) {
+			case "name":
+				updateNameProperty(property, value)
+				break
+			case "id":
+				updateIdProperty(property, value)
+				break
+			case "signature":
+				updateSignatureProperty(property, value)
+				break
+			case "createdAt":
+				updateCreatedAtProperty(property, value)
+				break
 		}
 	}
 
@@ -171,14 +220,22 @@ const Course = () => {
 									// Propiedades individuales
 									nameProperties={nameProperties}
 									idProperties={idProperties}
+									signatureProperties={signatureProperties}
+									createdAtProperties={createdAtProperties}
 									updateNameProperty={updateNameProperty}
 									updateIdProperty={updateIdProperty}
+									updateSignatureProperty={updateSignatureProperty}
+									updateCreatedAtProperty={updateCreatedAtProperty}
 									
 									// Posiciones
 									namePosition={namePosition}
 									setNamePosition={setNamePosition}
 									idPosition={idPosition}
 									setIdPosition={setIdPosition}
+									signaturePosition={signaturePosition}
+									setSignaturePosition={setSignaturePosition}
+									createdAtPosition={createdAtPosition}
+									setCreatedAtPosition={setCreatedAtPosition}
 									
 									// Otros estados
 									imageCert={imageCert}
@@ -208,8 +265,12 @@ const Course = () => {
 										<Gradebook
 											nameProperties={nameProperties}
 											idProperties={idProperties}
+											signatureProperties={signatureProperties}
+											createdAtProperties={createdAtProperties}
 											namePosition={namePosition}
 											idPosition={idPosition}
+											signaturePosition={signaturePosition}
+											createdAtPosition={createdAtPosition}
 											imageCert={imageCert}
 											reqScore={reqScore}
 										/>
