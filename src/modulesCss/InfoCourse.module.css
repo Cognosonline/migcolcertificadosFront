@@ -241,24 +241,44 @@
     position: relative;
     top: 0px;
     right: 0;
-    width: 90%;
-    max-width: 800px;
+    width: 98%;
+    max-width: 1200px; /* Aumentar aún más el ancho máximo */
     margin-bottom: 5px;
     background: whitesmoke;
-    padding: 10px;
+    padding: 12px 15px;
     border-radius: 10px;
-    display: flex;
-    justify-content: center;
+    display: grid; /* Cambiar a grid para mejor control */
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Grid responsivo */
     align-items: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
-    gap: 10px;
+    gap: 8px;
+    overflow-x: auto; /* Permitir scroll horizontal si es necesario */
+}
+
+/* Contenedor para grupos de controles */
+.toolbarGroup {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    min-width: fit-content;
+    white-space: nowrap;
+}
+
+/* Contenedor específico para botones de acción */
+.toolbarActions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    justify-self: end; /* Alinear a la derecha en el grid */
+    grid-column: -1; /* Ocupar la última columna */
 }
 
 .toolbarLabel {
-    font-size: 14px;
+    font-size: 13px; /* Reducir ligeramente el tamaño de fuente */
     font-weight: 500;
-    margin-right: 5px;
+    margin-right: 3px; /* Reducir el margen derecho */
+    white-space: nowrap; /* Evitar que se rompa en múltiples líneas */
 }
 
 .toolbarInput,
@@ -272,19 +292,23 @@
 }
 
 .toolbarInput {
-    width: 50px;
+    width: 45px; /* Reducir ligeramente el ancho */
     text-align: center;
 }
 
 .toolbarSelect {
-    width: 120px;
+    width: 100px; /* Reducir el ancho de los selects */
 }
 
 .toolbarColorPicker {
     cursor: pointer;
-    width: 40px;
-    height: 30px;
+    width: 35px; /* Reducir ligeramente el ancho */
+    height: 28px; /* Reducir ligeramente la altura */
     border: none;
+}
+
+.toolbarCheckbox {
+    margin: 0 3px; /* Añadir margen para el checkbox */
 }
 
 .divSavedCert {

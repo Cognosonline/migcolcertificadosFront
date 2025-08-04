@@ -13,10 +13,26 @@ import html2canvas from "html2canvas"
 
 const Student = () => {
   const { course, user } = useStateValue()
-  const [fontSize, setFontSize] = useState(16)
-  const [fontFamily, setFontFamily] = useState("Arial")
-  const [color, setColor] = useState("#000000")
-  const [isItalic, setIsItalic] = useState(false)
+  
+  // Propiedades del nombre
+  const [nameProperties, setNameProperties] = useState({
+    fontSize: 20,
+    fontFamily: "Arial",
+    color: "#000000",
+    isItalic: false,
+    isBold: false,
+  })
+  
+  // Propiedades de la cédula
+  const [idProperties, setIdProperties] = useState({
+    fontSize: 16,
+    fontFamily: "Arial", 
+    color: "#000000",
+    isItalic: false,
+    isBold: false,
+  })
+  
+  // Posiciones
   const [namePosition, setNamePosition] = useState({ top: 100, left: 100 })
   const [idPosition, setIdPosition] = useState({ top: 200, left: 100 })
   const [imageCert, setImageCert] = useState(null)
@@ -115,10 +131,21 @@ const Student = () => {
         const res = await api.get(`/certificateCourse/${course.course.courseId}`)
         localStorage.setItem("cetificate_data", JSON.stringify(res.data))
 
-        setColor(res.data.payload.color)
-        setFontFamily(res.data.payload.fontFamily)
-        setFontSize(res.data.payload.fontsize)
-        setIsItalic(res.data.payload.italic)
+        setNameProperties({
+          fontSize: res.data.payload.fontsize,
+          fontFamily: res.data.payload.fontFamily,
+          color: res.data.payload.color,
+          isItalic: res.data.payload.italic,
+          isBold: res.data.payload.bold || false
+        })
+        
+        setIdProperties({
+          fontSize: res.data.payload.fontsize,
+          fontFamily: res.data.payload.fontFamily,
+          color: res.data.payload.color,
+          isItalic: res.data.payload.italic,
+          isBold: res.data.payload.bold || false
+        })
         setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
         setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
 
@@ -412,13 +439,13 @@ const Student = () => {
                 position: "absolute",
                 top: `${namePosition.top}px`,
                 left: `${namePosition.left}px`,
-                fontSize: `${fontSize}px`,
-                fontFamily: fontFamily,
-                color: color,
-                fontStyle: isItalic ? "italic" : "normal",
+                fontSize: `${nameProperties.fontSize}px`,
+                fontFamily: nameProperties.fontFamily,
+                color: nameProperties.color,
+                fontStyle: nameProperties.isItalic ? "italic" : "normal",
+                fontWeight: nameProperties.isBold ? "bold" : 600,
                 background: "transparent",
                 padding: "5px", // PADDING ORIGINAL EXACTO
-                fontWeight: 600,
                 textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 letterSpacing: "0.5px",
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
@@ -432,13 +459,13 @@ const Student = () => {
                 position: "absolute",
                 top: `${idPosition.top}px`,
                 left: `${idPosition.left}px`,
-                fontSize: `${fontSize}px`,
-                fontFamily: fontFamily,
-                color: color,
-                fontStyle: isItalic ? "italic" : "normal",
+                fontSize: `${idProperties.fontSize}px`,
+                fontFamily: idProperties.fontFamily,
+                color: idProperties.color,
+                fontStyle: idProperties.isItalic ? "italic" : "normal",
+                fontWeight: idProperties.isBold ? "bold" : 600,
                 background: "transparent",
                 padding: "5px", // PADDING ORIGINAL EXACTO
-                fontWeight: 600,
                 textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 letterSpacing: "0.5px",
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES

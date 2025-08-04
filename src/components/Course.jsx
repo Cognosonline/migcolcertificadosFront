@@ -29,15 +29,62 @@ import InfoCourse from "./InfoCourse"
 import Gradebook from "./Gradebook"
 
 const Course = () => {
-	const [fontSize, setFontSize] = useState(20)
-	const [fontFamily, setFontFamily] = useState("Arial")
-	const [color, setColor] = useState("#000000")
-	const [isItalic, setIsItalic] = useState(false)
+	// Estados individuales para cada elemento
+	const [selectedElement, setSelectedElement] = useState("name") // "name" o "id"
+	
+	// Propiedades del nombre
+	const [nameProperties, setNameProperties] = useState({
+		fontSize: 20,
+		fontFamily: "Arial",
+		color: "#000000",
+		isItalic: false,
+		isBold: false,
+	})
+	
+	// Propiedades de la cédula
+	const [idProperties, setIdProperties] = useState({
+		fontSize: 16,
+		fontFamily: "Arial", 
+		color: "#000000",
+		isItalic: false,
+		isBold: false,
+	})
+	
+	// Posiciones (se mantienen separadas)
 	const [namePosition, setNamePosition] = useState({ top: 200, left: 100 })
 	const [idPosition, setIdPosition] = useState({ top: 250, left: 100 })
 	const [imageCert, setImageCert] = useState(null)
 	const [reqScore, setReqScore] = useState(null)
 	const [lodignGrade, setLodingGrade] = useState(false)
+
+	// Funciones para actualizar propiedades individuales
+	const updateNameProperty = (property, value) => {
+		setNameProperties(prev => ({
+			...prev,
+			[property]: value
+		}))
+	}
+
+	const updateIdProperty = (property, value) => {
+		setIdProperties(prev => ({
+			...prev,
+			[property]: value
+		}))
+	}
+
+	// Función para obtener las propiedades del elemento seleccionado
+	const getCurrentProperties = () => {
+		return selectedElement === "name" ? nameProperties : idProperties
+	}
+
+	// Función para actualizar propiedades del elemento seleccionado
+	const updateCurrentProperty = (property, value) => {
+		if (selectedElement === "name") {
+			updateNameProperty(property, value)
+		} else {
+			updateIdProperty(property, value)
+		}
+	}
 
 	const theme = useTheme()
 
@@ -115,18 +162,25 @@ const Course = () => {
 								}}
 							>
 								<InfoCourse
-									fontSize={fontSize}
-									setFontSize={setFontSize}
-									fontFamily={fontFamily}
-									setFontFamily={setFontFamily}
-									color={color}
-									setColor={setColor}
-									isItalic={isItalic}
-									setIsItalic={setIsItalic}
+									// Elemento seleccionado y sus propiedades
+									selectedElement={selectedElement}
+									setSelectedElement={setSelectedElement}
+									currentProperties={getCurrentProperties()}
+									updateCurrentProperty={updateCurrentProperty}
+									
+									// Propiedades individuales
+									nameProperties={nameProperties}
+									idProperties={idProperties}
+									updateNameProperty={updateNameProperty}
+									updateIdProperty={updateIdProperty}
+									
+									// Posiciones
 									namePosition={namePosition}
 									setNamePosition={setNamePosition}
 									idPosition={idPosition}
 									setIdPosition={setIdPosition}
+									
+									// Otros estados
 									imageCert={imageCert}
 									setImageCert={setImageCert}
 									reqScore={reqScore}
@@ -152,10 +206,8 @@ const Course = () => {
 										}}
 									>
 										<Gradebook
-											fontSize={fontSize}
-											fontFamily={fontFamily}
-											color={color}
-											isItalic={isItalic}
+											nameProperties={nameProperties}
+											idProperties={idProperties}
 											namePosition={namePosition}
 											idPosition={idPosition}
 											imageCert={imageCert}
