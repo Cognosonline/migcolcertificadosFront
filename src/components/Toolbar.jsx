@@ -63,51 +63,74 @@ const Toolbar = ({
 
   const handleSaveCert = async () => {
     try {
-      const res = await api.post(`/coords`,
-        {
-          courseId: courseId,
-          nameX: namePosition.left,
-          nameY: namePosition.top,
-          documentX: idPosition.left,
-          documentY: idPosition.top,
-          signatureX: signaturePosition.left,
-          signatureY: signaturePosition.top,
-          createdAtX: createdAtPosition.left,
-          createdAtY: createdAtPosition.top,
-          // Propiedades individuales para cada elemento
-          nameFontSize: nameProperties.fontSize,
-          nameFontFamily: nameProperties.fontFamily,
-          nameColor: nameProperties.color,
-          nameItalic: nameProperties.isItalic,
-          nameBold: nameProperties.isBold,
-          documentFontSize: idProperties.fontSize,
-          documentFontFamily: idProperties.fontFamily,
-          documentColor: idProperties.color,
-          documentItalic: idProperties.isItalic,
-          documentBold: idProperties.isBold,
-          signatureFontSize: signatureProperties.fontSize,
-          signatureFontFamily: signatureProperties.fontFamily,
-          signatureColor: signatureProperties.color,
-          signatureItalic: signatureProperties.isItalic,
-          signatureBold: signatureProperties.isBold,
-          createdAtFontSize: createdAtProperties.fontSize,
-          createdAtFontFamily: createdAtProperties.fontFamily,
-          createdAtColor: createdAtProperties.color,
-          createdAtItalic: createdAtProperties.isItalic,
-          createdAtBold: createdAtProperties.isBold,
-          // Mantener compatibilidad con propiedades globales por si el backend las necesita
-          fontsize: currentProperties.fontSize,
-          fontFamily: currentProperties.fontFamily,
-          color: currentProperties.color,
-          italic: currentProperties.isItalic
-        }, {
+      // Crear objeto completo con todas las propiedades nuevas
+
+      const completeData = {
+        courseId: courseId,
+        nameX: namePosition.left,
+        nameY: namePosition.top,
+        documentX: idPosition.left,
+        documentY: idPosition.top,
+        signatureX: signaturePosition.left,
+        signatureY: signaturePosition.top,
+        createdAtX: createdAtPosition.left,
+        createdAtY: createdAtPosition.top,
+
+        // Propiedades individuales para cada elemento
+
+        // Nombre
+        nameFontSize: nameProperties.fontSize,
+        nameFontFamily: nameProperties.fontFamily,
+        nameColor: nameProperties.color,
+        nameItalic: nameProperties.isItalic,
+        nameBold: nameProperties.isBold,
+
+        // Documento
+        documentFontSize: idProperties.fontSize,
+        documentFontFamily: idProperties.fontFamily,
+        documentColor: idProperties.color,
+        documentItalic: idProperties.isItalic,
+        documentBold: idProperties.isBold,
+
+        // Firma
+        signatureFontSize: signatureProperties.fontSize,
+        signatureFontFamily: signatureProperties.fontFamily,
+        signatureColor: signatureProperties.color,
+        signatureItalic: signatureProperties.isItalic,
+        signatureBold: signatureProperties.isBold,
+
+        // Fecha
+        createdAtFontSize: createdAtProperties.fontSize,
+        createdAtFontFamily: createdAtProperties.fontFamily,
+        createdAtColor: createdAtProperties.color,
+        createdAtItalic: createdAtProperties.isItalic,
+        createdAtBold: createdAtProperties.isBold,
+
+        // Mantener compatibilidad con propiedades globales
+
+        fontsize: currentProperties.fontSize,
+        fontFamily: currentProperties.fontFamily,
+        color: currentProperties.color,
+        italic: currentProperties.isItalic
+      };
+
+      const res = await api.post(`/coords`, completeData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
-
         }
       });
 
-      localStorage.setItem('cetificate_data', JSON.stringify(res.data));
+      // Combinar respuesta del backend con nuestros datos nuevos para persistencia local
+      const enhancedResponse = {
+        ...res.data,
+        payload: {
+          ...res.data.payload,
+          ...completeData // Agregar nuestros datos nuevos al payload
+        }
+      };
+
+      localStorage.setItem('cetificate_data', JSON.stringify(enhancedResponse));
+      console.log('Datos guardados (con propiedades individuales):', enhancedResponse);
 
       setLodiangImage(true)
     } catch (error) {
