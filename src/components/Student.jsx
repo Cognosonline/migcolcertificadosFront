@@ -131,21 +131,29 @@ const Student = () => {
         const res = await api.get(`/certificateCourse/${course.course.courseId}`)
         localStorage.setItem("cetificate_data", JSON.stringify(res.data))
 
-        setNameProperties({
-          fontSize: res.data.payload.fontsize,
-          fontFamily: res.data.payload.fontFamily,
-          color: res.data.payload.color,
-          isItalic: res.data.payload.italic,
-          isBold: res.data.payload.bold || false
-        })
-        
-        setIdProperties({
-          fontSize: res.data.payload.fontsize,
-          fontFamily: res.data.payload.fontFamily,
-          color: res.data.payload.color,
-          isItalic: res.data.payload.italic,
-          isBold: res.data.payload.bold || false
-        })
+        // Verificar si hay propiedades individuales guardadas
+        if (res.data.payload.nameProperties && res.data.payload.idProperties) {
+          // Usar propiedades individuales si están disponibles
+          setNameProperties(res.data.payload.nameProperties)
+          setIdProperties(res.data.payload.idProperties)
+        } else {
+          // Fallback a propiedades globales (compatibilidad con datos antiguos)
+          setNameProperties({
+            fontSize: res.data.payload.fontsize,
+            fontFamily: res.data.payload.fontFamily,
+            color: res.data.payload.color,
+            isItalic: res.data.payload.italic,
+            isBold: res.data.payload.bold || false
+          })
+          
+          setIdProperties({
+            fontSize: res.data.payload.fontsize,
+            fontFamily: res.data.payload.fontFamily,
+            color: res.data.payload.color,
+            isItalic: res.data.payload.italic,
+            isBold: res.data.payload.bold || false
+          })
+        }
         setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
         setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
 
