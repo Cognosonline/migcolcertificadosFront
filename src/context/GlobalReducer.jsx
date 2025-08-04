@@ -1,8 +1,8 @@
 export const initialState = {
     user: JSON.parse(localStorage.getItem("user_data")) || null,
-    dataCourses: JSON.parse(localStorage.getItem("courses_data")) || null,
+    dataCourses: JSON.parse(sessionStorage.getItem("courses_data")) || null,
     buttonCard: 0,
-    course:JSON.parse(localStorage.getItem("course_data")) || null,
+    course:JSON.parse(sessionStorage.getItem("course_data")) || null,
 
 }
 

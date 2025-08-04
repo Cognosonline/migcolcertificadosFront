@@ -782,7 +782,7 @@ const InfoCourse = ({
 									sx={{
 										width: "auto", // Cambiar de "100%" a "auto"
 										height: "100%",
-										maxWidth: "80vw", // Reducir de "95vw" a "80vw"
+										maxWidth: "95vw", // Aumentar para acomodar imagen de 900px
 										maxHeight: "95vh",
 										background: "#ffffff",
 										boxShadow: "0 24px 48px rgba(0,0,0,0.4)",
@@ -823,7 +823,7 @@ const InfoCourse = ({
 											display: "flex",
 											alignItems: "center",
 											justifyContent: "center",
-											p: 1, // Reducir padding de 2 a 1
+											p: 1,
 											background: alpha(theme.palette.grey[100], 0.3),
 											overflow: "auto",
 										}}
@@ -837,9 +837,10 @@ const InfoCourse = ({
 											onTouchEnd={handleTouchEnd}
 											sx={{
 												position: "relative",
-												width: "fit-content",
-												maxWidth: "100%",
-												maxHeight: "100%",
+												width: "900px", // Dimensión fija crucial para posicionamiento consistente
+												height: "100%",
+												minHeight: "530px", // Altura mínima como en el CSS original
+												display: "block", // Cambiar de flex a block para posicionamiento correcto
 												boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
 												borderRadius: 2,
 												overflow: "hidden",
@@ -853,8 +854,11 @@ const InfoCourse = ({
 														alt="Certificado"
 														className={style.modalImage}
 														style={{
-															width: "100%",
+															minWidth: "900px", // Ancho mínimo fijo como en el CSS original
+															maxHeight: "530px", // Altura máxima fija
+															width: "900px", // Ancho fijo para consistencia
 															height: "auto",
+															objectFit: "contain",
 															display: "block",
 														}}
 													/>
@@ -870,16 +874,12 @@ const InfoCourse = ({
 															fontFamily: fontFamily,
 															color: color,
 															fontStyle: isItalic ? "italic" : "normal",
-															background: backgroundSp ? "transparent" : "rgba(233, 229, 229, 0.9)",
-															border: draggingElement === "name" ? "3px solid #11b6d3" : "2px dashed rgba(0,0,0,0.4)",
-															padding: "8px 12px",
+															background: backgroundSp ? "transparent" : "#e9e5e5b9",
+															border: draggingElement === "name" ? "2px solid rgb(17, 182, 211)" : "none",
+															padding: "5px",
 															cursor: "move",
-															borderRadius: "6px",
 															userSelect: "none",
-															boxShadow:
-																draggingElement === "name" ? "0 6px 20px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.1)",
-															transition: "all 0.2s ease",
-															fontWeight: 500,
+															transform: "translate(-50%, 0)", // Centrar horizontalmente
 														}}
 													>
 														{"<<Nombre>>"}
@@ -896,16 +896,12 @@ const InfoCourse = ({
 															fontFamily: fontFamily,
 															color: color,
 															fontStyle: isItalic ? "italic" : "normal",
-															border: draggingElement === "id" ? "3px solid #ff6600" : "2px dashed rgba(0,0,0,0.4)",
-															padding: "8px 12px",
+															border: draggingElement === "id" ? "2px solid #ff6600" : "none",
+															padding: "5px",
 															cursor: "move",
-															background: backgroundSp ? "transparent" : "rgba(233, 229, 229, 0.9)",
-															borderRadius: "6px",
+															background: backgroundSp ? "transparent" : "#e9e5e5b9",
 															userSelect: "none",
-															boxShadow:
-																draggingElement === "id" ? "0 6px 20px rgba(0,0,0,0.3)" : "0 2px 8px rgba(0,0,0,0.1)",
-															transition: "all 0.2s ease",
-															fontWeight: 500,
+															transform: "translate(-50%, 0)", // Centrar horizontalmente
 														}}
 													>
 														{"1000000000"}
