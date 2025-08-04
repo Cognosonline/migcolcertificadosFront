@@ -318,6 +318,7 @@ const CardCourse = (props) => {
 						onClick={isStudent ? viewStudent : courseSelect}
 						loading={isLoading}
 						sx={{
+							color: theme.palette.home.text,
 							py: 1.2,
 							borderRadius: 2,
 							textTransform: 'none',
