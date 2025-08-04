@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import {
 	Box,
 	Typography,
@@ -111,25 +111,61 @@ export default function GradeBook({
 	const [searchInput, setSearchInput] = useState("")
 	const theme = useTheme()
 
+	// Añadir los mismos handlers de arrastre que InfoCourse
+	const containerRef = useRef(null)
+	const [draggingElement, setDraggingElement] = useState(null)
+	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
+
+	const handleMouseDown = (e, type) => {
+		const rect = e.target.getBoundingClientRect()
+		setDraggingElement(type)
+		setDragOffset({
+			x: e.clientX - rect.left,
+			y: e.clientY - rect.top,
+		})
+		e.preventDefault()
+	}
+
+	const handleMouseMove = (e) => {
+		if (draggingElement && containerRef.current) {
+			const containerRect = containerRef.current.getBoundingClientRect()
+			const deltaX = e.clientX - containerRect.left - dragOffset.x
+			const deltaY = e.clientY - containerRect.top - dragOffset.y
+
+			if (draggingElement === "name") {
+				// No modificar las posiciones, solo mostrar visualmente
+			} else if (draggingElement === "id") {
+				// No modificar las posiciones, solo mostrar visualmente  
+			}
+		}
+	}
+
+	const handleMouseUp = () => {
+		setDraggingElement(null)
+	}
+
 	const positionDataCertificate = (row) => {
 		const name = document.getElementById("name")
 		const cedula = document.getElementById("cedula")
-
-		name.innerHTML = "&lt;&lt;Nombre&gt;&gt;"
-		const placeholderWidth = name.getBoundingClientRect().width
-		const halfPlaceholder = placeholderWidth / 2
-		const originalLeft = namePosition.left
-		const centroPlaceholder = originalLeft + halfPlaceholder
-
+		
+		// Simplemente aplicar el contenido sin modificar posiciones
 		name.innerHTML = row.user.name.toUpperCase()
 		cedula.innerHTML = row.user.externalId
 
-		const userNameWidth = name.getBoundingClientRect().width
-		const halfUserName = userNameWidth / 2
-		let nuevoLeft = originalLeft + placeholderWidth
-		nuevoLeft -= halfPlaceholder
-		nuevoLeft -= halfUserName
-		name.style.left = `${nuevoLeft}px`
+		// Debug: Verificar estilos aplicados
+		// console.log("Name element styles:", {
+		// 	top: name.style.top,
+		// 	left: name.style.left,
+		// 	position: name.style.position
+		// })
+		// console.log("Cedula element styles:", {
+		// 	top: cedula.style.top,
+		// 	left: cedula.style.left,
+		// 	position: cedula.style.position
+		// })
+
+		// NO modificar las posiciones - usar directamente las coordenadas guardadas
+		// Las posiciones ya están aplicadas via props namePosition e idPosition
 	}
 
 	const DownloadButton = () => {
@@ -627,10 +663,10 @@ export default function GradeBook({
 						<Box
 							onClick={(e) => e.stopPropagation()}
 							sx={{
-								width: "auto",
-								height: "auto",
-								maxWidth: "80vw",
-								maxHeight: "90vh",
+								width: "auto", // Cambiar de "auto" a coincidir con InfoCourse
+								height: "100%", // Cambiar de "auto" a "100%" como InfoCourse
+								maxWidth: "95vw", // Aumentar para acomodar imagen de 900px
+								maxHeight: "95vh", // Cambiar de "90vh" a "95vh" como InfoCourse
 								background: "#ffffff",
 								boxShadow: "0 24px 48px rgba(0,0,0,0.4)",
 								borderRadius: 3,
@@ -663,17 +699,22 @@ export default function GradeBook({
 									display: "flex",
 									alignItems: "center",
 									justifyContent: "center",
-									p: 2,
+									p: 1,
 									background: alpha(theme.palette.grey[100], 0.3),
 									overflow: "auto",
 								}}
 							>
 								<Box
+									className={style.imageContainer}
+									ref={containerRef}
+									onMouseMove={handleMouseMove}
+									onMouseUp={handleMouseUp}
 									sx={{
 										position: "relative",
-										width: "fit-content",
-										maxWidth: "100%",
-										maxHeight: "100%",
+										width: "900px", // Dimensión fija crucial para posicionamiento consistente
+										height: "100%",
+										minHeight: "530px", // Altura mínima como en el CSS original
+										display: "block", // Cambiar de flex a block para posicionamiento correcto
 										boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
 										borderRadius: 2,
 										overflow: "hidden",
@@ -681,19 +722,24 @@ export default function GradeBook({
 									}}
 								>
 									{lodingImage ? (
-										<Box className={style.imageContainer}>
+										<>
 											<img
 												src={imageCert || "/placeholder.svg"}
 												alt="Certificado"
 												className={style.modalImage}
 												style={{
-													width: "100%",
+													minWidth: "900px",
+													maxHeight: "530px", 
+													width: "900px",
 													height: "auto",
+													objectFit: "contain",
 													display: "block",
 												}}
 											/>
 											<span
+												className={`draggableLabel ${draggingElement === "name" ? "dragging" : ""}`}
 												id="name"
+												onMouseDown={(e) => handleMouseDown(e, "name")}
 												style={{
 													position: "absolute",
 													top: `${namePosition.top}px`,
@@ -703,16 +749,16 @@ export default function GradeBook({
 													color: color,
 													fontStyle: isItalic ? "italic" : "normal",
 													background: "transparent",
-													padding: "8px 12px",
+													padding: "5px",
 													cursor: "move",
-													borderRadius: "6px",
 													userSelect: "none",
-													fontWeight: 500,
-													textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+													transform: "translate(-50%, 0)", // Centrar horizontalmente
 												}}
 											/>
 											<span
+												className={`draggableLabel ${draggingElement === "id" ? "dragging" : ""}`}
 												id="cedula"
+												onMouseDown={(e) => handleMouseDown(e, "id")}
 												style={{
 													position: "absolute",
 													top: `${idPosition.top}px`,
@@ -722,15 +768,13 @@ export default function GradeBook({
 													color: color,
 													background: "transparent",
 													fontStyle: isItalic ? "italic" : "normal",
-													padding: "8px 12px",
+													padding: "5px",
 													cursor: "move",
-													borderRadius: "6px",
 													userSelect: "none",
-													fontWeight: 500,
-													textShadow: "0 1px 3px rgba(0,0,0,0.3)",
+													transform: "translate(-50%, 0)", // Centrar horizontalmente
 												}}
 											/>
-										</Box>
+										</>
 									) : (
 										<Box
 											sx={{

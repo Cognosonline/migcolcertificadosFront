@@ -65,7 +65,7 @@ function NavBar({ window }) {
     } else {
       localStorage.removeItem("cetificate_data")
       localStorage.removeItem("cetificate_data_image")
-      localStorage.removeItem("course_data")
+      sessionStorage.removeItem("course_data")
       navigate(path)
     }
     // Cerrar drawer móvil después de navegar

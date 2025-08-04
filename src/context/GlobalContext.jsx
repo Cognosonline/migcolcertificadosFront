@@ -14,11 +14,11 @@ const ContextProvider = ({ children }) => {
     };
 
     const saveCoursesData = (dataCourses) => {
-        localStorage.setItem('courses_data', JSON.stringify(dataCourses));
+        sessionStorage.setItem('courses_data', JSON.stringify(dataCourses));
     };
 
     const saveCourseData = (dataCourse) => {
-        localStorage.setItem('course_data', JSON.stringify(dataCourse));
+        sessionStorage.setItem('course_data', JSON.stringify(dataCourse));
     };
 
 
