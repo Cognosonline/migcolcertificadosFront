@@ -241,37 +241,19 @@
     position: relative;
     top: 0px;
     right: 0;
-    width: 98%;
-    max-width: 1200px; /* Aumentar aún más el ancho máximo */
+    width: 95%;
+    max-width: 1000px; /* Aumentar el ancho máximo */
     margin-bottom: 5px;
     background: whitesmoke;
-    padding: 12px 15px;
+    padding: 10px;
     border-radius: 10px;
-    display: grid; /* Cambiar a grid para mejor control */
-    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); /* Grid responsivo */
+    display: flex;
+    justify-content: center;
     align-items: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
-    gap: 8px;
-    overflow-x: auto; /* Permitir scroll horizontal si es necesario */
-}
-
-/* Contenedor para grupos de controles */
-.toolbarGroup {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    min-width: fit-content;
-    white-space: nowrap;
-}
-
-/* Contenedor específico para botones de acción */
-.toolbarActions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    justify-self: end; /* Alinear a la derecha en el grid */
-    grid-column: -1; /* Ocupar la última columna */
+    gap: 8px; /* Reducir ligeramente el gap para que quepa mejor */
+    flex-wrap: wrap; /* Permitir que se envuelvan en pantallas pequeñas */
 }
 
 .toolbarLabel {

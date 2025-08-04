@@ -262,29 +262,18 @@ const InfoCourse = ({
 
 				if (dataCertificate) {
 					if (dataCertificate.payload.courseId === course.course.courseId) {
-						// Verificar si hay propiedades individuales guardadas
-						if (dataCertificate.payload.nameProperties && dataCertificate.payload.idProperties) {
-							// Usar propiedades individuales si están disponibles
-							Object.keys(dataCertificate.payload.nameProperties).forEach(key => {
-								updateNameProperty(key, dataCertificate.payload.nameProperties[key])
-							})
-							Object.keys(dataCertificate.payload.idProperties).forEach(key => {
-								updateIdProperty(key, dataCertificate.payload.idProperties[key])
-							})
-						} else {
-							// Fallback a propiedades globales (compatibilidad con datos antiguos)
-							updateNameProperty('color', dataCertificate.payload.color)
-							updateNameProperty('fontFamily', dataCertificate.payload.fontFamily)
-							updateNameProperty('fontSize', dataCertificate.payload.fontsize)
-							updateNameProperty('isItalic', dataCertificate.payload.italic)
-							updateNameProperty('isBold', dataCertificate.payload.bold || false)
-							
-							updateIdProperty('color', dataCertificate.payload.color)
-							updateIdProperty('fontFamily', dataCertificate.payload.fontFamily)
-							updateIdProperty('fontSize', dataCertificate.payload.fontsize)
-							updateIdProperty('isItalic', dataCertificate.payload.italic)
-							updateIdProperty('isBold', dataCertificate.payload.bold || false)
-						}
+						// Configurar propiedades para ambos elementos basándose en los datos guardados
+						updateNameProperty('color', dataCertificate.payload.color)
+						updateNameProperty('fontFamily', dataCertificate.payload.fontFamily)
+						updateNameProperty('fontSize', dataCertificate.payload.fontsize)
+						updateNameProperty('isItalic', dataCertificate.payload.italic)
+						updateNameProperty('isBold', dataCertificate.payload.bold || false)
+						
+						updateIdProperty('color', dataCertificate.payload.color)
+						updateIdProperty('fontFamily', dataCertificate.payload.fontFamily)
+						updateIdProperty('fontSize', dataCertificate.payload.fontsize)
+						updateIdProperty('isItalic', dataCertificate.payload.italic)
+						updateIdProperty('isBold', dataCertificate.payload.bold || false)
 						
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
@@ -844,10 +833,6 @@ const InfoCourse = ({
 											setSelectedElement={setSelectedElement}
 											currentProperties={currentProperties}
 											updateCurrentProperty={updateCurrentProperty}
-											
-											// Propiedades individuales para guardar ambas
-											nameProperties={nameProperties}
-											idProperties={idProperties}
 											
 											// Props existentes que no cambian
 											setLodiangImage={setLodiangImage}
