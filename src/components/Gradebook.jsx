@@ -94,11 +94,11 @@ const GradeChip = styled(Chip)(({ theme, passed }) => ({
 export default function GradeBook({
 	nameProperties,
 	idProperties,
-	signatureProperties,
+	courseNameProperties,
 	createdAtProperties,
 	namePosition,
 	idPosition,
-	signaturePosition,
+	courseNamePosition,
 	createdAtPosition,
 	imageCert,
 	reqScore,
@@ -149,7 +149,7 @@ export default function GradeBook({
 	const positionDataCertificate = (row) => {
 		const name = document.getElementById("name")
 		const cedula = document.getElementById("cedula")
-		const signature = document.getElementById("signature")
+		const courseName = document.getElementById("courseName")
 		const createdAt = document.getElementById("createdAt")
 		
 		// Simplemente aplicar el contenido sin modificar posiciones
@@ -157,7 +157,7 @@ export default function GradeBook({
 		cedula.innerHTML = row.user.externalId
 		
 		// Aplicar datos reales para firma y fecha con validación y placeholders
-		signature.innerHTML = row.user.signature || "Firma Digital"
+		courseName.innerHTML = row.user.courseName || "Firma Digital"
 		createdAt.innerHTML = row.user.createdAt ? new Date(row.user.createdAt).toLocaleDateString() : new Date().toLocaleDateString()
 
 		// Debug: Verificar estilos aplicados
@@ -785,26 +785,26 @@ export default function GradeBook({
 												}}
 											/>
 											<span
-												className={`draggableLabel ${draggingElement === "signature" ? "dragging" : ""}`}
-												id="signature"
-												onMouseDown={(e) => handleMouseDown(e, "signature")}
+												className={`draggableLabel ${draggingElement === "courseName" ? "dragging" : ""}`}
+												id="courseName"
+												onMouseDown={(e) => handleMouseDown(e, "courseName")}
 												style={{
 													position: "absolute",
-													top: `${signaturePosition.top}px`,
-													left: `${signaturePosition.left}px`,
-													fontSize: `${signatureProperties.fontSize}px`,
-													fontFamily: signatureProperties.fontFamily,
-													color: signatureProperties.color,
+													top: `${courseNamePosition.top}px`,
+													left: `${courseNamePosition.left}px`,
+													fontSize: `${courseNameProperties.fontSize}px`,
+													fontFamily: courseNameProperties.fontFamily,
+													color: courseNameProperties.color,
 													background: "transparent",
-													fontStyle: signatureProperties.isItalic ? "italic" : "normal",
-													fontWeight: signatureProperties.isBold ? "bold" : "normal",
+													fontStyle: courseNameProperties.isItalic ? "italic" : "normal",
+													fontWeight: courseNameProperties.isBold ? "bold" : "normal",
 													padding: "5px",
 													cursor: "move",
 													userSelect: "none",
 													transform: "translate(-50%, 0)", // Centrar horizontalmente
 												}}
 											>
-												{"Firma Digital"}
+												{"Nombre del curso"}
 											</span>
 											<span
 												className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}

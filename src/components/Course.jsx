@@ -30,7 +30,7 @@ import Gradebook from "./Gradebook"
 
 const Course = () => {
 	// Estados individuales para cada elemento
-	const [selectedElement, setSelectedElement] = useState("name") // "name", "id", "signature" o "createdAt"
+	const [selectedElement, setSelectedElement] = useState("name") // "name", "id", "courseName" o "createdAt"
 	
 	// Propiedades del nombre
 	const [nameProperties, setNameProperties] = useState({
@@ -51,7 +51,7 @@ const Course = () => {
 	})
 	
 	// Propiedades de la firma
-	const [signatureProperties, setSignatureProperties] = useState({
+	const [courseNameProperties, setcourseNameProperties] = useState({
 		fontSize: 14,
 		fontFamily: "Arial",
 		color: "#000000",
@@ -71,7 +71,7 @@ const Course = () => {
 	// Posiciones (se mantienen separadas)
 	const [namePosition, setNamePosition] = useState({ top: 200, left: 100 })
 	const [idPosition, setIdPosition] = useState({ top: 250, left: 100 })
-	const [signaturePosition, setSignaturePosition] = useState({ top: 400, left: 150 })
+	const [courseNamePosition, setcourseNamePosition] = useState({ top: 400, left: 150 })
 	const [createdAtPosition, setCreatedAtPosition] = useState({ top: 450, left: 150 })
 	const [imageCert, setImageCert] = useState(null)
 	const [reqScore, setReqScore] = useState(null)
@@ -92,8 +92,8 @@ const Course = () => {
 		}))
 	}
 
-	const updateSignatureProperty = (property, value) => {
-		setSignatureProperties(prev => ({
+	const updatecourseNameProperty = (property, value) => {
+		setcourseNameProperties(prev => ({
 			...prev,
 			[property]: value
 		}))
@@ -111,7 +111,7 @@ const Course = () => {
 		switch (selectedElement) {
 			case "name": return nameProperties
 			case "id": return idProperties
-			case "signature": return signatureProperties
+			case "courseName": return courseNameProperties
 			case "createdAt": return createdAtProperties
 			default: return nameProperties
 		}
@@ -126,8 +126,8 @@ const Course = () => {
 			case "id":
 				updateIdProperty(property, value)
 				break
-			case "signature":
-				updateSignatureProperty(property, value)
+			case "courseName":
+				updatecourseNameProperty(property, value)
 				break
 			case "createdAt":
 				updateCreatedAtProperty(property, value)
@@ -220,11 +220,11 @@ const Course = () => {
 									// Propiedades individuales
 									nameProperties={nameProperties}
 									idProperties={idProperties}
-									signatureProperties={signatureProperties}
+									courseNameProperties={courseNameProperties}
 									createdAtProperties={createdAtProperties}
 									updateNameProperty={updateNameProperty}
 									updateIdProperty={updateIdProperty}
-									updateSignatureProperty={updateSignatureProperty}
+									updatecourseNameProperty={updatecourseNameProperty}
 									updateCreatedAtProperty={updateCreatedAtProperty}
 									
 									// Posiciones
@@ -232,8 +232,8 @@ const Course = () => {
 									setNamePosition={setNamePosition}
 									idPosition={idPosition}
 									setIdPosition={setIdPosition}
-									signaturePosition={signaturePosition}
-									setSignaturePosition={setSignaturePosition}
+									courseNamePosition={courseNamePosition}
+									setcourseNamePosition={setcourseNamePosition}
 									createdAtPosition={createdAtPosition}
 									setCreatedAtPosition={setCreatedAtPosition}
 									
@@ -265,11 +265,11 @@ const Course = () => {
 										<Gradebook
 											nameProperties={nameProperties}
 											idProperties={idProperties}
-											signatureProperties={signatureProperties}
+											courseNameProperties={courseNameProperties}
 											createdAtProperties={createdAtProperties}
 											namePosition={namePosition}
 											idPosition={idPosition}
-											signaturePosition={signaturePosition}
+											courseNamePosition={courseNamePosition}
 											createdAtPosition={createdAtPosition}
 											imageCert={imageCert}
 											reqScore={reqScore}

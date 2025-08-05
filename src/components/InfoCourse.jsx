@@ -51,11 +51,11 @@ const InfoCourse = ({
 	// Propiedades individuales
 	nameProperties,
 	idProperties,
-	signatureProperties,
+	courseNameProperties,
 	createdAtProperties,
 	updateNameProperty,
 	updateIdProperty,
-	updateSignatureProperty,
+	updatecourseNameProperty,
 	updateCreatedAtProperty,
 	
 	// Posiciones
@@ -63,8 +63,8 @@ const InfoCourse = ({
 	setNamePosition,
 	idPosition,
 	setIdPosition,
-	signaturePosition,
-	setSignaturePosition,
+	courseNamePosition,
+	setcourseNamePosition,
 	createdAtPosition,
 	setCreatedAtPosition,
 	
@@ -114,8 +114,8 @@ const InfoCourse = ({
 				setNamePosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "id") {
 				setIdPosition({ top: deltaY, left: deltaX })
-			} else if (draggingElement === "signature") {
-				setSignaturePosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "courseName") {
+				setcourseNamePosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "createdAt") {
 				setCreatedAtPosition({ top: deltaY, left: deltaX })
 			}
@@ -147,8 +147,8 @@ const InfoCourse = ({
 				setNamePosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "id") {
 				setIdPosition({ top: deltaY, left: deltaX })
-			} else if (draggingElement === "signature") {
-				setSignaturePosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "courseName") {
+				setcourseNamePosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "createdAt") {
 				setCreatedAtPosition({ top: deltaY, left: deltaX })
 			}
@@ -292,11 +292,11 @@ const InfoCourse = ({
 						updateIdProperty('isItalic', dataCertificate.payload.documentItalic !== undefined ? dataCertificate.payload.documentItalic : dataCertificate.payload.italic)
 						updateIdProperty('isBold', dataCertificate.payload.documentBold !== undefined ? dataCertificate.payload.documentBold : (dataCertificate.payload.bold || false))
 						
-						updateSignatureProperty('color', dataCertificate.payload.signatureColor || dataCertificate.payload.color)
-						updateSignatureProperty('fontFamily', dataCertificate.payload.signatureFontFamily || dataCertificate.payload.fontFamily)
-						updateSignatureProperty('fontSize', dataCertificate.payload.signatureFontSize || dataCertificate.payload.fontsize)
-						updateSignatureProperty('isItalic', dataCertificate.payload.signatureItalic !== undefined ? dataCertificate.payload.signatureItalic : dataCertificate.payload.italic)
-						updateSignatureProperty('isBold', dataCertificate.payload.signatureBold !== undefined ? dataCertificate.payload.signatureBold : (dataCertificate.payload.bold || false))
+						updatecourseNameProperty('color', dataCertificate.payload.courseNameColor || dataCertificate.payload.color)
+						updatecourseNameProperty('fontFamily', dataCertificate.payload.courseNameFontFamily || dataCertificate.payload.fontFamily)
+						updatecourseNameProperty('fontSize', dataCertificate.payload.courseNameFontSize || dataCertificate.payload.fontsize)
+						updatecourseNameProperty('isItalic', dataCertificate.payload.courseNameItalic !== undefined ? dataCertificate.payload.courseNameItalic : dataCertificate.payload.italic)
+						updatecourseNameProperty('isBold', dataCertificate.payload.courseNameBold !== undefined ? dataCertificate.payload.courseNameBold : (dataCertificate.payload.bold || false))
 						
 						updateCreatedAtProperty('color', dataCertificate.payload.createdAtColor || dataCertificate.payload.color)
 						updateCreatedAtProperty('fontFamily', dataCertificate.payload.createdAtFontFamily || dataCertificate.payload.fontFamily)
@@ -306,7 +306,7 @@ const InfoCourse = ({
 						
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
-						setSignaturePosition({ top: dataCertificate.payload.signatureY || 300, left: dataCertificate.payload.signatureX || 450 })
+						setcourseNamePosition({ top: dataCertificate.payload.courseNameY || 300, left: dataCertificate.payload.courseNameX || 450 })
 						setCreatedAtPosition({ top: dataCertificate.payload.createdAtY || 350, left: dataCertificate.payload.createdAtX || 450 })
 
 						if (dataCertificate.payload.reqScore != 0) {
@@ -341,11 +341,11 @@ const InfoCourse = ({
 					updateIdProperty('isItalic', res.data.payload.documentItalic !== undefined ? res.data.payload.documentItalic : res.data.payload.italic)
 					updateIdProperty('isBold', res.data.payload.documentBold !== undefined ? res.data.payload.documentBold : (res.data.payload.bold || false))
 					
-					updateSignatureProperty('color', res.data.payload.signatureColor || res.data.payload.color)
-					updateSignatureProperty('fontFamily', res.data.payload.signatureFontFamily || res.data.payload.fontFamily)
-					updateSignatureProperty('fontSize', res.data.payload.signatureFontSize || res.data.payload.fontsize)
-					updateSignatureProperty('isItalic', res.data.payload.signatureItalic !== undefined ? res.data.payload.signatureItalic : res.data.payload.italic)
-					updateSignatureProperty('isBold', res.data.payload.signatureBold !== undefined ? res.data.payload.signatureBold : (res.data.payload.bold || false))
+					updatecourseNameProperty('color', res.data.payload.courseNameColor || res.data.payload.color)
+					updatecourseNameProperty('fontFamily', res.data.payload.courseNameFontFamily || res.data.payload.fontFamily)
+					updatecourseNameProperty('fontSize', res.data.payload.courseNameFontSize || res.data.payload.fontsize)
+					updatecourseNameProperty('isItalic', res.data.payload.courseNameItalic !== undefined ? res.data.payload.courseNameItalic : res.data.payload.italic)
+					updatecourseNameProperty('isBold', res.data.payload.courseNameBold !== undefined ? res.data.payload.courseNameBold : (res.data.payload.bold || false))
 					
 					updateCreatedAtProperty('color', res.data.payload.createdAtColor || res.data.payload.color)
 					updateCreatedAtProperty('fontFamily', res.data.payload.createdAtFontFamily || res.data.payload.fontFamily)
@@ -355,7 +355,7 @@ const InfoCourse = ({
 					
 					setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
 					setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
-					setSignaturePosition({ top: res.data.payload.signatureY || 300, left: res.data.payload.signatureX || 450 })
+					setcourseNamePosition({ top: res.data.payload.courseNameY || 300, left: res.data.payload.courseNameX || 450 })
 					setCreatedAtPosition({ top: res.data.payload.createdAtY || 350, left: res.data.payload.createdAtX || 450 })
 
 					if (res.data.payload.reqScore != 0) {
@@ -883,13 +883,13 @@ const InfoCourse = ({
 											// Propiedades individuales
 											nameProperties={nameProperties}
 											idProperties={idProperties}
-											signatureProperties={signatureProperties}
+											courseNameProperties={courseNameProperties}
 											createdAtProperties={createdAtProperties}
 											
 											// Posiciones
 											namePosition={namePosition}
 											idPosition={idPosition}
-											signaturePosition={signaturePosition}
+											courseNamePosition={courseNamePosition}
 											createdAtPosition={createdAtPosition}
 											
 											// Props existentes que no cambian
@@ -999,28 +999,28 @@ const InfoCourse = ({
 														{"1000000000"}
 													</span>
 													<span
-														className={`draggableLabel ${draggingElement === "signature" ? "dragging" : ""}`}
-														onMouseDown={(e) => handleMouseDown(e, "signature")}
-														onTouchStart={(e) => handleTouchStart(e, "signature")}
-														onClick={() => setSelectedElement("signature")}
+														className={`draggableLabel ${draggingElement === "courseName" ? "dragging" : ""}`}
+														onMouseDown={(e) => handleMouseDown(e, "courseName")}
+														onTouchStart={(e) => handleTouchStart(e, "courseName")}
+														onClick={() => setSelectedElement("courseName")}
 														style={{
 															position: "absolute",
-															top: `${signaturePosition.top}px`,
-															left: `${signaturePosition.left}px`,
-															fontSize: `${signatureProperties.fontSize}px`,
-															fontFamily: signatureProperties.fontFamily,
-															color: signatureProperties.color,
-															fontStyle: signatureProperties.isItalic ? "italic" : "normal",
-															fontWeight: signatureProperties.isBold ? "bold" : "normal",
-															border: draggingElement === "signature" ? "2px solid #ff6600" : selectedElement === "signature" ? "2px solid #007bff" : "none",
+															top: `${courseNamePosition.top}px`,
+															left: `${courseNamePosition.left}px`,
+															fontSize: `${courseNameProperties.fontSize}px`,
+															fontFamily: courseNameProperties.fontFamily,
+															color: courseNameProperties.color,
+															fontStyle: courseNameProperties.isItalic ? "italic" : "normal",
+															fontWeight: courseNameProperties.isBold ? "bold" : "normal",
+															border: draggingElement === "courseName" ? "2px solid #ff6600" : selectedElement === "courseName" ? "2px solid #007bff" : "none",
 															padding: "5px",
 															cursor: "move",
-															background: backgroundSp ? "transparent" : selectedElement === "signature" ? "#d1ecf1" : "#e9e5e5b9",
+															background: backgroundSp ? "transparent" : selectedElement === "courseName" ? "#d1ecf1" : "#e9e5e5b9",
 															userSelect: "none",
 															transform: "translate(-50%, 0)", // Centrar horizontalmente
 														}}
 													>
-														{"<<Firma>>"}
+														{"<<Nombre del curso>>"}
 													</span>
 													<span
 														className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}

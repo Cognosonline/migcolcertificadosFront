@@ -16,13 +16,13 @@ const Toolbar = ({
   // Propiedades individuales
   nameProperties,
   idProperties,
-  signatureProperties,
+  courseNameProperties,
   createdAtProperties,
   
   // Posiciones
   namePosition,
   idPosition,
-  signaturePosition,
+  courseNamePosition,
   createdAtPosition,
   
   // Props existentes que no cambian
@@ -71,8 +71,8 @@ const Toolbar = ({
         nameY: namePosition.top,
         documentX: idPosition.left,
         documentY: idPosition.top,
-        signatureX: signaturePosition.left,
-        signatureY: signaturePosition.top,
+        courseNameX: courseNamePosition.left,
+        courseNameY: courseNamePosition.top,
         createdAtX: createdAtPosition.left,
         createdAtY: createdAtPosition.top,
 
@@ -93,11 +93,11 @@ const Toolbar = ({
         documentBold: idProperties.isBold,
 
         // Firma
-        signatureFontSize: signatureProperties.fontSize,
-        signatureFontFamily: signatureProperties.fontFamily,
-        signatureColor: signatureProperties.color,
-        signatureItalic: signatureProperties.isItalic,
-        signatureBold: signatureProperties.isBold,
+        courseNameFontSize: courseNameProperties.fontSize,
+        courseNameFontFamily: courseNameProperties.fontFamily,
+        courseNameColor: courseNameProperties.color,
+        courseNameItalic: courseNameProperties.isItalic,
+        courseNameBold: courseNameProperties.isBold,
 
         // Fecha
         createdAtFontSize: createdAtProperties.fontSize,
@@ -152,7 +152,7 @@ const Toolbar = ({
         <select value={selectedElement} onChange={(e) => setSelectedElement(e.target.value)} className={style.toolbarSelect}>
           <option value="name">Nombre</option>
           <option value="id">Cédula</option>
-          <option value="signature">Firma</option>
+          <option value="courseName">Firma</option>
           <option value="createdAt">Fecha</option>
         </select>
 

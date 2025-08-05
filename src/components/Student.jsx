@@ -33,7 +33,7 @@ const Student = () => {
   })
   
   // Propiedades de la firma
-  const [signatureProperties, setSignatureProperties] = useState({
+  const [courseNameProperties, setcourseNameProperties] = useState({
     fontSize: 16,
     fontFamily: "Arial",
     color: "#000000",
@@ -53,7 +53,7 @@ const Student = () => {
   // Posiciones
   const [namePosition, setNamePosition] = useState({ top: 100, left: 100 })
   const [idPosition, setIdPosition] = useState({ top: 200, left: 100 })
-  const [signaturePosition, setSignaturePosition] = useState({ top: 300, left: 100 })
+  const [courseNamePosition, setcourseNamePosition] = useState({ top: 300, left: 100 })
   const [createdAtPosition, setCreatedAtPosition] = useState({ top: 350, left: 100 })
   const [imageCert, setImageCert] = useState(null)
   const [imageLoad, setImageLoad] = useState(false)
@@ -167,12 +167,12 @@ const Student = () => {
           isBold: res.data.payload.documentBold !== undefined ? res.data.payload.documentBold : (res.data.payload.bold || false)
         })
         
-        setSignatureProperties({
-          fontSize: res.data.payload.signatureFontSize || res.data.payload.fontsize,
-          fontFamily: res.data.payload.signatureFontFamily || res.data.payload.fontFamily,
-          color: res.data.payload.signatureColor || res.data.payload.color,
-          isItalic: res.data.payload.signatureItalic !== undefined ? res.data.payload.signatureItalic : res.data.payload.italic,
-          isBold: res.data.payload.signatureBold !== undefined ? res.data.payload.signatureBold : (res.data.payload.bold || false)
+        setcourseNameProperties({
+          fontSize: res.data.payload.courseNameFontSize || res.data.payload.fontsize,
+          fontFamily: res.data.payload.courseNameFontFamily || res.data.payload.fontFamily,
+          color: res.data.payload.courseNameColor || res.data.payload.color,
+          isItalic: res.data.payload.courseNameItalic !== undefined ? res.data.payload.courseNameItalic : res.data.payload.italic,
+          isBold: res.data.payload.courseNameBold !== undefined ? res.data.payload.courseNameBold : (res.data.payload.bold || false)
         })
         
         setCreatedAtProperties({
@@ -185,7 +185,7 @@ const Student = () => {
         
         setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
         setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
-        setSignaturePosition({ top: res.data.payload.signatureY || 300, left: res.data.payload.signatureX || 450 })
+        setcourseNamePosition({ top: res.data.payload.courseNameY || 300, left: res.data.payload.courseNameX || 450 })
         setCreatedAtPosition({ top: res.data.payload.createdAtY || 350, left: res.data.payload.createdAtX || 450 })
 
         if (!res.data.payload.fileName == "") {
@@ -517,16 +517,16 @@ const Student = () => {
 
             {/* Firma - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
             <span
-              id="signature"
+              id="courseName"
               style={{
                 position: "absolute",
-                top: `${signaturePosition.top}px`,
-                left: `${signaturePosition.left}px`,
-                fontSize: `${signatureProperties.fontSize}px`,
-                fontFamily: signatureProperties.fontFamily,
-                color: signatureProperties.color,
-                fontStyle: signatureProperties.isItalic ? "italic" : "normal",
-                fontWeight: signatureProperties.isBold ? "bold" : 600,
+                top: `${courseNamePosition.top}px`,
+                left: `${courseNamePosition.left}px`,
+                fontSize: `${courseNameProperties.fontSize}px`,
+                fontFamily: courseNameProperties.fontFamily,
+                color: courseNameProperties.color,
+                fontStyle: courseNameProperties.isItalic ? "italic" : "normal",
+                fontWeight: courseNameProperties.isBold ? "bold" : 600,
                 background: "transparent",
                 padding: "5px", // PADDING ORIGINAL EXACTO
                 textShadow: "0 2px 4px rgba(0,0,0,0.1)",
@@ -534,7 +534,7 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {user?.signature || "Firma Digital"}
+              {user?.courseName || "Firma Digital"}
             </span>
 
             {/* Fecha - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
