@@ -12,7 +12,10 @@ import { jsPDF } from "jspdf"
 import html2canvas from "html2canvas"
 
 const Student = () => {
-  const { course, user } = useStateValue()
+  const { course, user, certificate } = useStateValue()
+  
+  // Estado para los datos del certificado
+  const [certificateData, setCertificateData] = useState(null)
   
   // Propiedades del nombre
   const [nameProperties, setNameProperties] = useState({
@@ -63,6 +66,7 @@ const Student = () => {
 
   const handleCloseModal = (e) => {
     e.preventDefault()
+    localStorage.removeItem("certificate_student_data")
     localStorage.removeItem("cetificate_data")
     localStorage.removeItem("cetificate_data_image")
     localStorage.removeItem("course_data")
@@ -89,7 +93,7 @@ const Student = () => {
         pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight)
         
         // Eliminar el rectángulo de borde para exportación limpia
-        pdf.save(`Certificado_${course.course.name}_${user.cedula}.pdf`)
+        pdf.save(`Certificado_${certificateData?.courseName || 'Curso'}_${certificateData?.studentDocument || 'Estudiante'}.pdf`)
       } catch (error) {
         console.error("Error al descargar PDF:", error)
       } finally {
@@ -136,11 +140,16 @@ const Student = () => {
   const positionDataCertificate = () => {
     const name = document.getElementById("name")
     const cedula = document.getElementById("cedula")
+    const courseName = document.getElementById("courseName")
+    const createdAt = document.getElementById("createdAt")
 
-    // Simplemente aplicar el contenido sin modificar posiciones
-    // El centrado lo maneja CSS con transform
-    name.innerHTML = user.nombre.given.toUpperCase() + " " + user.nombre.family.toUpperCase()
-    cedula.innerHTML = user.cedula
+    // Usar los datos del certificado obtenidos de la API
+    if (certificateData) {
+      name.innerHTML = certificateData.studentName.toUpperCase()
+      cedula.innerHTML = certificateData.studentDocument
+      courseName.innerHTML = certificateData.courseName
+      createdAt.innerHTML = new Date(certificateData.issuedDate).toLocaleDateString()
+    }
     
     setImageLoad(true)
   }
@@ -148,50 +157,57 @@ const Student = () => {
   useEffect(() => {
     const validateCertificate = async () => {
       try {
-        const res = await api.get(`/certificateCourse/${course.course.courseId}`)
-        localStorage.setItem("cetificate_data", JSON.stringify(res.data))
+        // Obtener datos del certificado desde localStorage (viene de viewCertificateStudent)
+        const storedCertificate = localStorage.getItem("certificate_student_data")
+        if (storedCertificate) {
+          const certificateInfo = JSON.parse(storedCertificate)
+          setCertificateData(certificateInfo.payload)
+          
+          // Configurar propiedades usando la estructura certificate dentro de payload
+          const cert = certificateInfo.payload.certificate
+          
+          setNameProperties({
+            fontSize: cert.nameFontSize || cert.fontsize,
+            fontFamily: cert.nameFontFamily || cert.fontFamily,
+            color: cert.nameColor || cert.color,
+            isItalic: cert.nameItalic !== undefined ? cert.nameItalic : cert.italic,
+            isBold: cert.nameBold !== undefined ? cert.nameBold : false
+          })
+          
+          setIdProperties({
+            fontSize: cert.documentFontSize || cert.fontsize,
+            fontFamily: cert.documentFontFamily || cert.fontFamily,
+            color: cert.documentColor || cert.color,
+            isItalic: cert.documentItalic !== undefined ? cert.documentItalic : cert.italic,
+            isBold: cert.documentBold !== undefined ? cert.documentBold : false
+          })
+          
+          setcourseNameProperties({
+            fontSize: cert.courseNameFontSize || cert.fontsize,
+            fontFamily: cert.courseNameFontFamily || cert.fontFamily,
+            color: cert.courseNameColor || cert.color,
+            isItalic: cert.courseNameItalic !== undefined ? cert.courseNameItalic : cert.italic,
+            isBold: cert.courseNameBold !== undefined ? cert.courseNameBold : false
+          })
+          
+          setCreatedAtProperties({
+            fontSize: cert.createdAtFontSize || cert.fontsize,
+            fontFamily: cert.createdAtFontFamily || cert.fontFamily,
+            color: cert.createdAtColor || cert.color,
+            isItalic: cert.createdAtItalic !== undefined ? cert.createdAtItalic : cert.italic,
+            isBold: cert.createdAtBold !== undefined ? cert.createdAtBold : false
+          })
+          
+          setNamePosition({ top: cert.nameY, left: cert.nameX })
+          setIdPosition({ top: cert.documentY, left: cert.documentX })
+          setcourseNamePosition({ top: cert.courseNameY, left: cert.courseNameX })
+          setCreatedAtPosition({ top: cert.dateY, left: cert.dateX })
 
-        setNameProperties({
-          fontSize: res.data.payload.nameFontSize || res.data.payload.fontsize,
-          fontFamily: res.data.payload.nameFontFamily || res.data.payload.fontFamily,
-          color: res.data.payload.nameColor || res.data.payload.color,
-          isItalic: res.data.payload.nameItalic !== undefined ? res.data.payload.nameItalic : res.data.payload.italic,
-          isBold: res.data.payload.nameBold !== undefined ? res.data.payload.nameBold : (res.data.payload.bold || false)
-        })
-        
-        setIdProperties({
-          fontSize: res.data.payload.documentFontSize || res.data.payload.fontsize,
-          fontFamily: res.data.payload.documentFontFamily || res.data.payload.fontFamily,
-          color: res.data.payload.documentColor || res.data.payload.color,
-          isItalic: res.data.payload.documentItalic !== undefined ? res.data.payload.documentItalic : res.data.payload.italic,
-          isBold: res.data.payload.documentBold !== undefined ? res.data.payload.documentBold : (res.data.payload.bold || false)
-        })
-        
-        setcourseNameProperties({
-          fontSize: res.data.payload.courseNameFontSize || res.data.payload.fontsize,
-          fontFamily: res.data.payload.courseNameFontFamily || res.data.payload.fontFamily,
-          color: res.data.payload.courseNameColor || res.data.payload.color,
-          isItalic: res.data.payload.courseNameItalic !== undefined ? res.data.payload.courseNameItalic : res.data.payload.italic,
-          isBold: res.data.payload.courseNameBold !== undefined ? res.data.payload.courseNameBold : (res.data.payload.bold || false)
-        })
-        
-        setCreatedAtProperties({
-          fontSize: res.data.payload.createdAtFontSize || res.data.payload.fontsize,
-          fontFamily: res.data.payload.createdAtFontFamily || res.data.payload.fontFamily,
-          color: res.data.payload.createdAtColor || res.data.payload.color,
-          isItalic: res.data.payload.createdAtItalic !== undefined ? res.data.payload.createdAtItalic : res.data.payload.italic,
-          isBold: res.data.payload.createdAtBold !== undefined ? res.data.payload.createdAtBold : (res.data.payload.bold || false)
-        })
-        
-        setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
-        setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
-        setcourseNamePosition({ top: res.data.payload.courseNameY || 300, left: res.data.payload.courseNameX || 450 })
-        setCreatedAtPosition({ top: res.data.payload.createdAtY || 350, left: res.data.payload.createdAtX || 450 })
-
-        if (!res.data.payload.fileName == "") {
-          const resCert = await api.get(`/certificate/${res.data.payload.fileName}`)
-          localStorage.setItem("cetificate_data_image", JSON.stringify(resCert.data.image))
-          setImageCert(resCert.data.image)
+          // Obtener la imagen del certificado
+          if (cert.fileName && cert.fileName !== "") {
+            const resCert = await api.get(`/certificate/${cert.fileName}`)
+            setImageCert(resCert.data.image)
+          }
         }
       } catch (error) {
         console.log(error)
@@ -337,7 +353,7 @@ const Student = () => {
               textOverflow: "ellipsis",
             }}
           >
-            {course.course.name}
+            {certificateData?.courseName || course?.course?.name || "Cargando curso..."}
           </Typography>
           <Box
             sx={{
@@ -355,7 +371,7 @@ const Student = () => {
               fontSize: "0.85rem",
             }}
           >
-            {user.cedula}
+            {certificateData?.studentDocument || user?.cedula || "Cargando ID..."}
           </Typography>
         </Box>
       </Fade>
@@ -490,7 +506,7 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {user?.name?.toUpperCase() || "NOMBRE DEL ESTUDIANTE"}
+              {certificateData?.studentName?.toUpperCase() || "NOMBRE DEL ESTUDIANTE"}
             </span>
 
             {/* Cédula - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
@@ -512,10 +528,10 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {user?.externalId || "ID DEL ESTUDIANTE"}
+              {certificateData?.studentDocument || "ID DEL ESTUDIANTE"}
             </span>
 
-            {/* Firma - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
+            {/* Nombre del Curso - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
             <span
               id="courseName"
               style={{
@@ -534,7 +550,7 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {user?.courseName || "Firma Digital"}
+              {certificateData?.courseName || "Nombre del Curso"}
             </span>
 
             {/* Fecha - CON CENTRADO CSS COMO EN OTROS COMPONENTES */}
@@ -556,7 +572,7 @@ const Student = () => {
                 transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
               }}
             >
-              {user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : new Date().toLocaleDateString()}
+              {certificateData?.issuedDate ? new Date(certificateData.issuedDate).toLocaleDateString() : new Date().toLocaleDateString()}
             </span>
           </Box>
         </Box>

@@ -53,14 +53,14 @@ const ContextProvider = ({ children }) => {
                 }
             });
 
-            const dataCourses = result.data.payload;           
+            const dataCourses = result.data.payload;
 
             // 🔍 Filtrar los cursos según roles y score
             const filteredCourses = dataCourses.filter(course => {
                 const role = course.role || ""; // Asegurar que sea string
                 const isTeacher = role === "Instructor" || role === "A";  // "A" suena a un código que tal vez significa profesor
                 const isStudent = role === "Student";
-                
+
 
                 const score = course.courseInfo?.score;
 
@@ -91,7 +91,7 @@ const ContextProvider = ({ children }) => {
 
             const dataCourse = result.data.payload
             saveCourseData(dataCourse);
-            
+
 
             dispatch({
                 type: 'GET_COURSE',
@@ -104,13 +104,37 @@ const ContextProvider = ({ children }) => {
 
     }
 
+    const getUserCertificate = async (userId, courseId) => {
+        try {
+
+            const result = await api.get(`/user-certificate/${userId}/${courseId}`);
+
+            const certificateData = result.data
+            // Guardar los datos del certificado con la clave esperada por Student.jsx
+            localStorage.setItem('certificate_student_data', JSON.stringify(certificateData));
+
+            const dataCourse = result.data.payload
+            saveCourseData(dataCourse);
+
+            dispatch({
+                type: 'GET_COURSE',
+                payload: dataCourse
+            })
+
+        } catch (error) {
+            console.log('error al cargar el certificado');
+        }
+
+    }
+
 
     return (
         <MyContext.Provider value={{
             ...state,
             singInUser,
             getCourses,
-            getCourse
+            getCourse,
+            getUserCertificate,
         }}>
             {children}
         </MyContext.Provider>

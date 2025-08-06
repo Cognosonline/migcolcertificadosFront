@@ -32,7 +32,7 @@ const CardCourse = (props) => {
 	const navigate = useNavigate();
 	const theme = useTheme();
 	const [isLoading, setIsLoading] = useState(false);
-	const { getCourse } = useStateValue();
+	const { getCourse, getUserCertificate, user } = useStateValue();
 	const [validateScore, setValidateScore] = useState(true);
 	const [scoreData, setScoreData] = useState({
 		userScore: 0,
@@ -65,6 +65,19 @@ const CardCourse = (props) => {
 			navigate('/student');
 		} catch (error) {
 			console.log('Error al obtener el curso:', error);
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const viewCertificateStudent = async (e) => {
+		setIsLoading(true);
+		try {
+			e.preventDefault();
+			await getUserCertificate(user?.externalId || user?.id, course.courseInfo.courseId);
+			navigate('/student');
+		} catch (error) {
+			console.log('Error al obtener el certificado:', error);
 		} finally {
 			setIsLoading(false);
 		}
@@ -315,7 +328,7 @@ const CardCourse = (props) => {
 						variant="contained"
 						color={roleConfig.actionColor}
 						startIcon={roleConfig.actionIcon}
-						onClick={isStudent ? viewStudent : courseSelect}
+						onClick={isStudent ? viewCertificateStudent : courseSelect}
 						loading={isLoading}
 						sx={{
 							color: theme.palette.home.text,
