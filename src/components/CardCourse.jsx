@@ -25,6 +25,7 @@ import {
 import { LoadingButton } from '@mui/lab';
 
 import { useStateValue } from '../context/GlobalContext';
+import { useNotifications } from "../hooks/useNotifications";
 import api from '../../axiosConfig';
 
 const CardCourse = (props) => {
@@ -40,6 +41,9 @@ const CardCourse = (props) => {
 		normalizedScore: 0,
 		reqScore: 0
 	});
+
+	//const [toolView, setToolView] = useState(true);
+	const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
 	const isStudent = course.role === 'Student';
 	const isProfessor = course.role === 'Instructor' || course.role === 'A';
@@ -65,6 +69,7 @@ const CardCourse = (props) => {
 			navigate('/student');
 		} catch (error) {
 			console.log('Error al obtener el curso:', error);
+			showError( error?.response?.data?.error ||'Error al obtener el curso');
 		} finally {
 			setIsLoading(false);
 		}
@@ -78,6 +83,7 @@ const CardCourse = (props) => {
 			navigate('/student');
 		} catch (error) {
 			console.log('Error al obtener el certificado:', error);
+			showError( error?.response?.data?.error ||'Error al cargar el certificado');
 		} finally {
 			setIsLoading(false);
 		}

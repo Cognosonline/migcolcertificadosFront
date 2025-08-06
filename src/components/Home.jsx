@@ -23,7 +23,7 @@ import {
 import {
   Search as SearchIcon,
   School as SchoolIcon,
-	FindInPage as FindInPageIcon,
+  FindInPage as FindInPageIcon,
   Person as PersonIcon,
   Class as ClassIcon,
   FilterList as FilterListIcon,
@@ -33,6 +33,7 @@ import CardCourse from "./CardCourse"
 import NavBar from "../components/Navbar"
 import Profile from "./Profile"
 import { useStateValue } from "../context/GlobalContext"
+import { useNotifications } from "../hooks/useNotifications";
 
 const Home = () => {
   const [searchInput, setSearchInput] = useState("")
@@ -41,6 +42,9 @@ const Home = () => {
   const theme = useTheme()
 
   const { user, dataCourses, getCourses } = useStateValue()
+
+  //const [toolView, setToolView] = useState(true);
+  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
   const handleChange = (event) => {
     setMyCourse(event.target.value)
@@ -80,11 +84,12 @@ const Home = () => {
       const fetchData = async () => {
         try {
           if (dataCourses == null) {
-            await getCourses(user.cedula)
+            const res = await getCourses(user.cedula)
             setShowCourses(true)
           }
         } catch (error) {
           console.error("Error al obtener los cursos:", error)
+          showError( error?.response?.data?.error ||'Error al obtener los cursos');
         } finally {
           setShowCourses(true)
         }

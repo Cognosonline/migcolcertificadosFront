@@ -40,6 +40,8 @@ import style from "../modulesCss/InfoCourse.module.css"
 import { jsPDF } from "jspdf"
 import html2canvas from "html2canvas"
 import Toolbar from "./Toolbar"
+import { useNotifications } from "../hooks/useNotifications";
+import CourseDataHelper from "../utils/CourseDataHelper";
 
 const InfoCourse = ({
 	// Elemento seleccionado y sus propiedades
@@ -47,7 +49,7 @@ const InfoCourse = ({
 	setSelectedElement,
 	currentProperties = {},
 	updateCurrentProperty,
-	
+
 	// Propiedades individuales
 	nameProperties = {},
 	idProperties = {},
@@ -57,7 +59,7 @@ const InfoCourse = ({
 	updateIdProperty,
 	updatecourseNameProperty,
 	updateDateProperty,
-	
+
 	// Posiciones
 	namePosition = { top: 200, left: 100 },
 	setNamePosition,
@@ -67,7 +69,7 @@ const InfoCourse = ({
 	setcourseNamePosition,
 	datePosition = { top: 350, left: 100 },
 	setDatePosition,
-	
+
 	// Otros estados
 	imageCert,
 	setImageCert,
@@ -91,6 +93,8 @@ const InfoCourse = ({
 
 	const { course } = useStateValue()
 	const theme = useTheme()
+
+	const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
 	const [draggingElement, setDraggingElement] = useState(null)
 	const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 })
@@ -205,6 +209,8 @@ const InfoCourse = ({
 				},
 			})
 
+			showSuccess(response.data.message || 'Imagen cargada correctamente');
+
 			clearInterval(progressInterval)
 			setUploadProgress(100)
 
@@ -221,7 +227,7 @@ const InfoCourse = ({
 				updateNameProperty('fontSize', res.data.payload.fontsize)
 				updateNameProperty('isItalic', res.data.payload.italic)
 				updateNameProperty('isBold', res.data.payload.bold || false)
-				
+
 				updateIdProperty('color', res.data.payload.color)
 				updateIdProperty('fontFamily', res.data.payload.fontFamily)
 				updateIdProperty('fontSize', res.data.payload.fontsize)
@@ -239,7 +245,7 @@ const InfoCourse = ({
 			}
 		} catch (error) {
 			console.error("Error al subir la imagen:", error)
-			alert("Error al subir la imagen")
+			showError( error?.response?.data?.error ||'Error al subir la imagen');
 			setImage(null)
 			setFile(null)
 			document.getElementById("file-input").value = ""
@@ -251,7 +257,8 @@ const InfoCourse = ({
 
 	const saveReqCal = async (value) => {
 		if (!course?.course?.courseId) {
-			alert("Error: Información del curso no disponible")
+			// alert("Error: Información del curso no disponible")
+			showError('Error: Información del curso no disponible');
 			return
 		}
 
@@ -273,14 +280,26 @@ const InfoCourse = ({
 			)
 
 			if (res) {
-				console.log("Nota actualizada")
+				showSuccess('Nota actualizada correctamente');
 			} else {
-				console.log("No actualizada")
+				showError('Error al actualizar la nota');
 			}
 		} catch (error) {
 			console.log(error)
 		}
 	}
+
+	// ✅ Debug - Validar integridad de datos del curso
+	useEffect(() => {
+		const validation = CourseDataHelper.validateCourseData();
+		console.log('🔍 InfoCourse - Validación de datos:', validation);
+		
+		// Si no hay datos del curso original, mostrar advertencia
+		if (!validation.hasCourseData && validation.hasCertificateData) {
+			console.warn('⚠️ Datos de curso perdidos pero certificado presente');
+			showWarning('Los datos del curso se han perdido. Recargue la página.');
+		}
+	}, []);
 
 	useEffect(() => {
 		const validateCertificate = async () => {
@@ -303,25 +322,25 @@ const InfoCourse = ({
 						updateNameProperty('fontSize', dataCertificate.payload.nameFontSize || dataCertificate.payload.fontsize)
 						updateNameProperty('isItalic', dataCertificate.payload.nameItalic !== undefined ? dataCertificate.payload.nameItalic : dataCertificate.payload.italic)
 						updateNameProperty('isBold', dataCertificate.payload.nameBold !== undefined ? dataCertificate.payload.nameBold : (dataCertificate.payload.bold || false))
-						
+
 						updateIdProperty('color', dataCertificate.payload.documentColor || dataCertificate.payload.color)
 						updateIdProperty('fontFamily', dataCertificate.payload.documentFontFamily || dataCertificate.payload.fontFamily)
 						updateIdProperty('fontSize', dataCertificate.payload.documentFontSize || dataCertificate.payload.fontsize)
 						updateIdProperty('isItalic', dataCertificate.payload.documentItalic !== undefined ? dataCertificate.payload.documentItalic : dataCertificate.payload.italic)
 						updateIdProperty('isBold', dataCertificate.payload.documentBold !== undefined ? dataCertificate.payload.documentBold : (dataCertificate.payload.bold || false))
-						
+
 						updatecourseNameProperty('color', dataCertificate.payload.courseNameColor || dataCertificate.payload.color)
 						updatecourseNameProperty('fontFamily', dataCertificate.payload.courseNameFontFamily || dataCertificate.payload.fontFamily)
 						updatecourseNameProperty('fontSize', dataCertificate.payload.courseNameFontSize || dataCertificate.payload.fontsize)
 						updatecourseNameProperty('isItalic', dataCertificate.payload.courseNameItalic !== undefined ? dataCertificate.payload.courseNameItalic : dataCertificate.payload.italic)
 						updatecourseNameProperty('isBold', dataCertificate.payload.courseNameBold !== undefined ? dataCertificate.payload.courseNameBold : (dataCertificate.payload.bold || false))
-						
+
 						updateDateProperty('color', dataCertificate.payload.dateColor || dataCertificate.payload.color)
 						updateDateProperty('fontFamily', dataCertificate.payload.dateFontFamily || dataCertificate.payload.fontFamily)
 						updateDateProperty('fontSize', dataCertificate.payload.dateFontSize || dataCertificate.payload.fontsize)
 						updateDateProperty('isItalic', dataCertificate.payload.dateItalic !== undefined ? dataCertificate.payload.dateItalic : dataCertificate.payload.italic)
 						updateDateProperty('isBold', dataCertificate.payload.dateBold !== undefined ? dataCertificate.payload.dateBold : (dataCertificate.payload.bold || false))
-						
+
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
 						setcourseNamePosition({ top: dataCertificate.payload.courseNameY || 300, left: dataCertificate.payload.courseNameX || 450 })
@@ -352,25 +371,25 @@ const InfoCourse = ({
 					updateNameProperty('fontSize', res.data.payload.nameFontSize || res.data.payload.fontsize)
 					updateNameProperty('isItalic', res.data.payload.nameItalic !== undefined ? res.data.payload.nameItalic : res.data.payload.italic)
 					updateNameProperty('isBold', res.data.payload.nameBold !== undefined ? res.data.payload.nameBold : (res.data.payload.bold || false))
-					
+
 					updateIdProperty('color', res.data.payload.documentColor || res.data.payload.color)
 					updateIdProperty('fontFamily', res.data.payload.documentFontFamily || res.data.payload.fontFamily)
 					updateIdProperty('fontSize', res.data.payload.documentFontSize || res.data.payload.fontsize)
 					updateIdProperty('isItalic', res.data.payload.documentItalic !== undefined ? res.data.payload.documentItalic : res.data.payload.italic)
 					updateIdProperty('isBold', res.data.payload.documentBold !== undefined ? res.data.payload.documentBold : (res.data.payload.bold || false))
-					
+
 					updatecourseNameProperty('color', res.data.payload.courseNameColor || res.data.payload.color)
 					updatecourseNameProperty('fontFamily', res.data.payload.courseNameFontFamily || res.data.payload.fontFamily)
 					updatecourseNameProperty('fontSize', res.data.payload.courseNameFontSize || res.data.payload.fontsize)
 					updatecourseNameProperty('isItalic', res.data.payload.courseNameItalic !== undefined ? res.data.payload.courseNameItalic : res.data.payload.italic)
 					updatecourseNameProperty('isBold', res.data.payload.courseNameBold !== undefined ? res.data.payload.courseNameBold : (res.data.payload.bold || false))
-					
+
 					updateDateProperty('color', res.data.payload.dateColor || res.data.payload.color)
 					updateDateProperty('fontFamily', res.data.payload.dateFontFamily || res.data.payload.fontFamily)
 					updateDateProperty('fontSize', res.data.payload.dateFontSize || res.data.payload.fontsize)
 					updateDateProperty('isItalic', res.data.payload.dateItalic !== undefined ? res.data.payload.dateItalic : res.data.payload.italic)
 					updateDateProperty('isBold', res.data.payload.dateBold !== undefined ? res.data.payload.dateBold : (res.data.payload.bold || false))
-					
+
 					setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
 					setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
 					setcourseNamePosition({ top: res.data.payload.courseNameY || 300, left: res.data.payload.courseNameX || 450 })
@@ -457,9 +476,30 @@ const InfoCourse = ({
 												fontSize: { xs: "1.5rem", sm: "1.8rem", md: "2rem" },
 												mb: 0.5,
 												textShadow: "0 2px 4px rgba(0,0,0,0.2)",
+												display: "flex",
+												alignItems: "center",
+												gap: 1,
 											}}
 										>
-											{course?.course?.name || "Cargando..."}
+											{course?.course?.name || (
+												<>
+													Cargando curso...
+													<Box
+														sx={{
+															width: 20,
+															height: 20,
+															border: '2px solid rgba(255,255,255,0.3)',
+															borderTop: '2px solid #ffffff',
+															borderRadius: '50%',
+															animation: 'spin 1s linear infinite',
+															'@keyframes spin': {
+																'0%': { transform: 'rotate(0deg)' },
+																'100%': { transform: 'rotate(360deg)' },
+															},
+														}}
+													/>
+												</>
+											)}
 										</Typography>
 										<Typography
 											variant="h6"
@@ -470,7 +510,7 @@ const InfoCourse = ({
 												fontWeight: 500,
 											}}
 										>
-											ID: {course?.course?.courseId || "..."}
+											ID: {course?.course?.courseId || "Cargando..."}
 										</Typography>
 									</Box>
 								</Box>
@@ -644,10 +684,17 @@ const InfoCourse = ({
 										</Box>
 
 										<Button
-											onClick={() => setIsModalOpen(true)}
+											onClick={() => {
+												if (!course?.course?.courseId) {
+													showError('Error: Información del curso no disponible. Espere a que se cargue completamente.');
+													return;
+												}
+												setIsModalOpen(true);
+											}}
 											variant="contained"
 											size="large"
 											startIcon={<VisibilityIcon />}
+											disabled={!course?.course?.courseId}
 											sx={{
 												background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
 												color: "#ffffff",
@@ -902,19 +949,19 @@ const InfoCourse = ({
 											setSelectedElement={setSelectedElement}
 											currentProperties={currentProperties}
 											updateCurrentProperty={updateCurrentProperty}
-											
+
 											// Propiedades individuales
 											nameProperties={nameProperties}
 											idProperties={idProperties}
 											courseNameProperties={courseNameProperties}
 											dateProperties={dateProperties}
-											
+
 											// Posiciones
 											namePosition={namePosition}
 											idPosition={idPosition}
 											courseNamePosition={courseNamePosition}
 											datePosition={datePosition}
-											
+
 											// Props existentes que no cambian
 											setLodiangImage={setLodiangImage}
 											courseId={course?.course?.courseId}

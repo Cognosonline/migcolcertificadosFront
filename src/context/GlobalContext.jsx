@@ -1,6 +1,7 @@
 import { createContext, useReducer, useContext } from "react";
 import { initialState, reducer } from "./GlobalReducer";
 import api from '../../axiosConfig.js';
+import { useNotifications } from "../hooks/useNotifications";
 
 export const MyContext = createContext();
 
@@ -8,6 +9,7 @@ const ContextProvider = ({ children }) => {
 
     //const navigate = useNavigate();
     const [state, dispatch] = useReducer(reducer, initialState);
+    const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
     const saveUserData = (dataUser) => {
         localStorage.setItem('user_data', JSON.stringify(dataUser));
@@ -19,6 +21,10 @@ const ContextProvider = ({ children }) => {
 
     const saveCourseData = (dataCourse) => {
         sessionStorage.setItem('course_data', JSON.stringify(dataCourse));
+    };
+
+    const saveCertificateCourseData = (certificateCourseData) => {
+        sessionStorage.setItem('certificate_course_data', JSON.stringify(certificateCourseData));
     };
 
 
@@ -41,7 +47,9 @@ const ContextProvider = ({ children }) => {
             })
 
         } catch (error) {
-            console.log(error)
+            console.log(error);
+            showError('Error al iniciar sesión');
+            showError('Error al iniciar sesión');
         }
     }
 
@@ -80,6 +88,7 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error);
+            showError('Error al cargar los cursos');
         }
     };
 
@@ -100,6 +109,7 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log('error al cargar el curso');
+            showError('Error al cargar el curso');
         }
 
     }
@@ -112,16 +122,21 @@ const ContextProvider = ({ children }) => {
             // console.log("📡 Respuesta de la API:", result.data)
 
             const certificateData = result.data
-            // Guardar los datos del certificado con la clave esperada por Student.jsx
+            // Guardar los datos del certificado con una clave específica
             localStorage.setItem('certificate_student_data', JSON.stringify(certificateData));
+            
+            // Guardar datos del certificado en sessionStorage con clave específica
+            saveCertificateCourseData(certificateData);
 
-            const dataCourse = result.data.payload
-            saveCourseData(dataCourse);
+            // ❌ NO sobrescribir course_data - mantener los datos originales del curso
+            // const dataCourse = result.data.payload
+            // saveCourseData(dataCourse);
 
-            dispatch({
-                type: 'GET_COURSE',
-                payload: dataCourse
-            })
+            // ❌ NO despachar al reducer para evitar sobrescribir el estado del curso
+            // dispatch({
+            //     type: 'GET_COURSE',
+            //     payload: dataCourse
+            // })
 
             // ✅ IMPORTANTE: Retornar los datos del certificado
             // console.log("✅ Retornando certificateData:", certificateData)
@@ -129,8 +144,14 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log('❌ Error al cargar el certificado:', error);
+            showError('Error al cargar el certificado');
             return null; // Retornar null en caso de error
         }
+    }
+
+    // Función helper para obtener datos de certificado sin afectar el estado del curso
+    const getCertificateCourseData = () => {
+        return JSON.parse(sessionStorage.getItem('certificate_course_data')) || null;
     }
 
 
@@ -141,6 +162,7 @@ const ContextProvider = ({ children }) => {
             getCourses,
             getCourse,
             getUserCertificate,
+            getCertificateCourseData,
         }}>
             {children}
         </MyContext.Provider>

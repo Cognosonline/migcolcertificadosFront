@@ -2,8 +2,8 @@ export const initialState = {
     user: JSON.parse(localStorage.getItem("user_data")) || null,
     dataCourses: JSON.parse(sessionStorage.getItem("courses_data")) || null,
     buttonCard: 0,
-    course:JSON.parse(sessionStorage.getItem("course_data")) || null,
-
+    course: JSON.parse(sessionStorage.getItem("course_data")) || null,
+    certificateCourseData: JSON.parse(sessionStorage.getItem("certificate_course_data")) || null,
 }
 
 export function reducer (state,action){
@@ -25,6 +25,12 @@ export function reducer (state,action){
                 ...state,
                 course: payload
             }
+        case 'GET_CERTIFICATE_COURSE_DATA':
+            return{
+                ...state,
+                certificateCourseData: payload
+            }
+        default:
+            return state;
     }
-
 }

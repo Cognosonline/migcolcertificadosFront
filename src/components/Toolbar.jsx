@@ -5,6 +5,7 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import style from "../modulesCss/InfoCourse.module.css";
 import { useEffect, useState } from "react";
 import api from "../../axiosConfig";
+import { useNotifications } from "../hooks/useNotifications";
 
 const Toolbar = ({ 
   // Elemento seleccionado y sus propiedades
@@ -33,10 +34,11 @@ const Toolbar = ({
   setIsModalOpen,
   toolView,
   setToolView,
-  setBackgroundSp
+  // setBackgroundSp
 }) => {
 
   //const [toolView, setToolView] = useState(true);
+  const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
   const handleDeleteCert = async () => {
     try {
@@ -55,16 +57,23 @@ const Toolbar = ({
         setImageCert(null);
         setLodiangImage(false);
         setIsModalOpen(false);
+        showSuccess('Certificado eliminado correctamente');
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
+      showError('Error al eliminar el certificado');
     }
   }
 
   const handleSaveCert = async () => {
     try {
-      // Crear objeto completo con todas las propiedades nuevas
+      // Validar que courseId existe
+      if (!courseId) {
+        showError('Error: ID del curso no disponible');
+        return;
+      }
 
+      // Crear objeto completo con todas las propiedades nuevas
       const completeData = {
         courseId: courseId,
         nameX: namePosition.left,
@@ -114,6 +123,8 @@ const Toolbar = ({
         italic: currentProperties.isItalic
       };
 
+      // console.log('Enviando datos:', completeData);
+
       const res = await api.post(`/coords`, completeData, {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -132,9 +143,25 @@ const Toolbar = ({
       localStorage.setItem('cetificate_data', JSON.stringify(enhancedResponse));
       // console.log('Datos guardados (con propiedades individuales):', enhancedResponse);
 
-      setLodiangImage(true)
+      setLodiangImage(true);
+      showSuccess(res.data.message || 'Certificado guardado correctamente');
     } catch (error) {
+      showError('Error al actualizar propiedades del certificado');
       console.log('error al actualizar propiedades del certificado', error);
+      
+      // Mostrar más detalles del error
+      const errorMessage = error?.response?.data?.error || 
+                          error?.response?.data?.message || 
+                          error?.message || 
+                          'Error al guardar el certificado';
+      
+      showError(`Error: ${errorMessage}`);
+      
+      // Debug adicional
+      if (error?.response?.status === 404) {
+        console.log('Error 404 - Verificar courseId:', courseId);
+        showWarning('Verifique que el curso esté cargado correctamente');
+      }
     }
   }
 
@@ -197,7 +224,7 @@ const Toolbar = ({
           onClick={() => {
             document.getElementById('toolbar').style.background = 'whitesmoke'
             setToolView(true)
-            setBackgroundSp(false)
+            // setBackgroundSp(false)
 
             setLodiangImage(true);
           }} // Al hacer clic, oculta el input y muestra el valor guardado
@@ -217,7 +244,13 @@ const Toolbar = ({
           </IconButton>
           <IconButton
             aria-label="save"
+            disabled={!courseId} // Deshabilitar si no hay courseId
             onClick={() => {
+              if (!courseId) {
+                showError('Error: Información del curso no disponible');
+                return;
+              }
+              
               document.getElementById('toolbar').style.background = 'transparent'
               setToolView(false);
 

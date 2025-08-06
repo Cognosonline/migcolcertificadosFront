@@ -44,6 +44,8 @@ import style from "../modulesCss/Gradebook.module.css"
 import { jsPDF } from "jspdf"
 import html2canvas from "html2canvas"
 import Loader from "./Loader.jsx"
+import { useNotifications } from "../hooks/useNotifications"
+import CourseDataHelper from "../utils/CourseDataHelper"
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
 	[`&.MuiTableCell-head`]: {
@@ -103,7 +105,8 @@ export default function GradeBook({
 	imageCert,
 	reqScore,
 }) {
-	const { course, user, getUserCertificate } = useStateValue()
+	const { course, user, getUserCertificate, getCertificateCourseData } = useStateValue()
+	const { showSuccess, showError, showWarning, showInfo } = useNotifications()
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth)
 	// Estado local para preservar estudiantes y evitar que se reseteen
 	const [localStudents, setLocalStudents] = useState(course?.students || [])
@@ -176,15 +179,18 @@ export default function GradeBook({
 			// Validación más específica
 			if (certificateResponse !== null && certificateResponse !== undefined) {
 				setCertificateData(certificateResponse)
+				showSuccess(`Certificado cargado para ${student.user.name}`);
 				// Mantener loading por un momento para que se procesen los datos
 				setTimeout(() => {
 					setLodiangImage(true)
 				}, 500)
 			} else {
 				setLodiangImage(true)
+				showError('No se pudo cargar el certificado');
 			}
 		} catch (error) {
 			setLodiangImage(true)
+			showError(`Error al cargar certificado: ${error.message}`);
 		}
 	}
 
@@ -195,6 +201,10 @@ export default function GradeBook({
 		setSelectedStudent(null)
 		setUserDow(null)
 		setLodiangImage(true) // Resetear a true para el próximo uso
+		
+		// ✅ Limpiar datos de certificado sin afectar course_data
+		CourseDataHelper.clearCertificateData();
+		// console.log('🧹 Datos de certificado limpiados');
 	}
 
 	const positionDataCertificate = () => {
@@ -284,6 +294,10 @@ export default function GradeBook({
 	}
 
 	useEffect(() => {
+		// ✅ Debug - Validar integridad de datos
+		// const validation = CourseDataHelper.validateCourseData();
+		// console.log('🔍 Gradebook - Validación de datos:', validation);
+		
 		// Sincronizar estudiantes locales cuando cambie course.students
 		if (course?.students && course.students.length > 0) {
 			setLocalStudents(course.students)
