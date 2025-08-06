@@ -17,13 +17,13 @@ const Toolbar = ({
   nameProperties,
   idProperties,
   courseNameProperties,
-  createdAtProperties,
+  dateProperties,
   
   // Posiciones
   namePosition,
   idPosition,
   courseNamePosition,
-  createdAtPosition,
+  datePosition,
   
   // Props existentes que no cambian
   setLodiangImage,
@@ -73,8 +73,8 @@ const Toolbar = ({
         documentY: idPosition.top,
         courseNameX: courseNamePosition.left,
         courseNameY: courseNamePosition.top,
-        createdAtX: createdAtPosition.left,
-        createdAtY: createdAtPosition.top,
+        dateX: datePosition.left,
+        dateY: datePosition.top,
 
         // Propiedades individuales para cada elemento
 
@@ -100,11 +100,11 @@ const Toolbar = ({
         courseNameBold: courseNameProperties.isBold,
 
         // Fecha
-        createdAtFontSize: createdAtProperties.fontSize,
-        createdAtFontFamily: createdAtProperties.fontFamily,
-        createdAtColor: createdAtProperties.color,
-        createdAtItalic: createdAtProperties.isItalic,
-        createdAtBold: createdAtProperties.isBold,
+        dateFontSize: dateProperties.fontSize,
+        dateFontFamily: dateProperties.fontFamily,
+        dateColor: dateProperties.color,
+        dateItalic: dateProperties.isItalic,
+        dateBold: dateProperties.isBold,
 
         // Mantener compatibilidad con propiedades globales
 
@@ -130,7 +130,7 @@ const Toolbar = ({
       };
 
       localStorage.setItem('cetificate_data', JSON.stringify(enhancedResponse));
-      console.log('Datos guardados (con propiedades individuales):', enhancedResponse);
+      // console.log('Datos guardados (con propiedades individuales):', enhancedResponse);
 
       setLodiangImage(true)
     } catch (error) {
@@ -153,7 +153,7 @@ const Toolbar = ({
           <option value="name">Nombre</option>
           <option value="id">Cédula</option>
           <option value="courseName">Firma</option>
-          <option value="createdAt">Fecha</option>
+          <option value="date">Fecha</option>
         </select>
 
         <label className={style.toolbarLabel}>Tamaño:</label>

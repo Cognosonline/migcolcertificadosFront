@@ -95,22 +95,27 @@ export default function GradeBook({
 	nameProperties,
 	idProperties,
 	courseNameProperties,
-	createdAtProperties,
+	dateProperties,
 	namePosition,
 	idPosition,
 	courseNamePosition,
-	createdAtPosition,
+	datePosition,
 	imageCert,
 	reqScore,
 }) {
-	const { course, user } = useStateValue()
+	const { course, user, getUserCertificate } = useStateValue()
 	const [windowWidth, setWindowWidth] = useState(window.innerWidth)
-	const [filteredStudents, setFilteredStudents] = useState(course.students)
+	// Estado local para preservar estudiantes y evitar que se reseteen
+	const [localStudents, setLocalStudents] = useState(course?.students || [])
+	const [filteredStudents, setFilteredStudents] = useState(course?.students || [])
+	// Estado local para preservar courseId
+	const [localCourseId, setLocalCourseId] = useState(course?.course?.courseId)
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [selectedStudent, setSelectedStudent] = useState(null)
 	const [lodingImage, setLodiangImage] = useState(true)
 	const [userDow, setUserDow] = useState(null)
 	const [searchInput, setSearchInput] = useState("")
+	const [certificateData, setCertificateData] = useState(null)
 	const theme = useTheme()
 
 	// Añadir los mismos handlers de arrastre que InfoCourse
@@ -146,34 +151,75 @@ export default function GradeBook({
 		setDraggingElement(null)
 	}
 
-	const positionDataCertificate = (row) => {
+	const handleCertificateClick = async (student) => {
+		try {
+			// Limpiar estado previo ANTES de abrir el modal
+			setCertificateData(null)
+			setLodiangImage(false)
+			
+			// Abrir modal inmediatamente con loader
+			setIsModalOpen(true)
+			setSelectedStudent(student)
+			setUserDow(student.user.externalId)
+			
+			// Usar courseId local o del contexto como fallback
+			const courseId = localCourseId || course?.course?.courseId
+			const userId = student.user.id
+			
+			if (!courseId) {
+				setLodiangImage(true)
+				return
+			}
+			
+			const certificateResponse = await getUserCertificate(userId, courseId)
+			
+			// Validación más específica
+			if (certificateResponse !== null && certificateResponse !== undefined) {
+				setCertificateData(certificateResponse)
+				// Mantener loading por un momento para que se procesen los datos
+				setTimeout(() => {
+					setLodiangImage(true)
+				}, 500)
+			} else {
+				setLodiangImage(true)
+			}
+		} catch (error) {
+			setLodiangImage(true)
+		}
+	}
+
+	// Función para cerrar el modal y limpiar estado
+	const closeModal = () => {
+		setIsModalOpen(false)
+		setCertificateData(null)
+		setSelectedStudent(null)
+		setUserDow(null)
+		setLodiangImage(true) // Resetear a true para el próximo uso
+	}
+
+	const positionDataCertificate = () => {
+		if (!certificateData) {
+			return
+		}
+		
 		const name = document.getElementById("name")
 		const cedula = document.getElementById("cedula")
 		const courseName = document.getElementById("courseName")
-		const createdAt = document.getElementById("createdAt")
+		const date = document.getElementById("date")
 		
-		// Simplemente aplicar el contenido sin modificar posiciones
-		name.innerHTML = row.user.name.toUpperCase()
-		cedula.innerHTML = row.user.externalId
+		// Los datos están en certificateData.payload según los logs
+		const payload = certificateData.payload || certificateData
 		
-		// Aplicar datos reales para firma y fecha con validación y placeholders
-		courseName.innerHTML = row.user.courseName || "Firma Digital"
-		createdAt.innerHTML = row.user.createdAt ? new Date(row.user.createdAt).toLocaleDateString() : new Date().toLocaleDateString()
-
-		// Debug: Verificar estilos aplicados
-		// console.log("Name element styles:", {
-		// 	top: name.style.top,
-		// 	left: name.style.left,
-		// 	position: name.style.position
-		// })
-		// console.log("Cedula element styles:", {
-		// 	top: cedula.style.top,
-		// 	left: cedula.style.left,
-		// 	position: cedula.style.position
-		// })
-
-		// NO modificar las posiciones - usar directamente las coordenadas guardadas
-		// Las posiciones ya están aplicadas via props namePosition e idPosition
+		// Usar los datos del servicio getUserCertificate con el formato correcto
+		if (name) name.innerHTML = payload.studentName?.toUpperCase() || ""
+		if (cedula) cedula.innerHTML = payload.studentDocument || ""
+		if (courseName) courseName.innerHTML = payload.courseName || ""
+		if (date) {
+			const formattedDate = payload.issuedDate 
+				? new Date(payload.issuedDate).toLocaleDateString() 
+				: new Date().toLocaleDateString()
+			date.innerHTML = formattedDate
+		}
 	}
 
 	const DownloadButton = () => {
@@ -191,7 +237,14 @@ export default function GradeBook({
 
 			pdf.addImage(imgData, "PNG", margin, margin, imgWidth, imgHeight)
 			pdf.rect(margin, margin, imgWidth, imgHeight)
-			pdf.save(`Certificado_${course.course.name}_${userDow}.pdf`)
+			
+			// Usar los datos del certificado para el nombre del archivo
+			const payload = certificateData?.payload || certificateData
+			const fileName = payload?.studentName 
+				? `Certificado_${payload.studentName.replace(/\s+/g, '_')}_${payload.studentDocument || userDow}.pdf`
+				: `Certificado_${course?.course?.name || 'Curso'}_${userDow}.pdf`
+			
+			pdf.save(fileName)
 		}
 
 		return (
@@ -231,7 +284,19 @@ export default function GradeBook({
 	}
 
 	useEffect(() => {
-		const filtered = course.students?.filter((student) => {
+		// Sincronizar estudiantes locales cuando cambie course.students
+		if (course?.students && course.students.length > 0) {
+			setLocalStudents(course.students)
+		}
+		
+		// Preservar courseId cuando esté disponible
+		if (course?.course?.courseId && !localCourseId) {
+			setLocalCourseId(course.course.courseId)
+		}
+	}, [course?.students, course?.course?.courseId])
+
+	useEffect(() => {
+		const filtered = localStudents?.filter((student) => {
 			const externalId = student?.user?.externalId || ""
 			const name = student?.user?.name || ""
 			return (
@@ -240,21 +305,21 @@ export default function GradeBook({
 			)
 		})
 		setFilteredStudents(filtered)
-	}, [searchInput, course.students])
+	}, [searchInput, localStudents])
 
 	useEffect(() => {
 		const handleResize = () => setWindowWidth(window.innerWidth)
 		window.addEventListener("resize", handleResize)
 		return () => window.removeEventListener("resize", handleResize)
-	}, [course.students])
+	}, [])
 
 	useEffect(() => {
-		if (isModalOpen && selectedStudent) {
+		if (isModalOpen && certificateData && lodingImage) {
 			setTimeout(() => {
-				positionDataCertificate(selectedStudent)
-			}, 2000)
+				positionDataCertificate()
+			}, 100) // Reducir tiempo para mejor UX
 		}
-	}, [isModalOpen, selectedStudent])
+	}, [isModalOpen, certificateData, lodingImage])
 
 	return (
 		<Box>
@@ -371,7 +436,7 @@ export default function GradeBook({
 			{windowWidth < 900 ? (
 				// Vista móvil con cards mejoradas
 				<Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-					{course.students ? (
+					{localStudents && localStudents.length > 0 ? (
 						filteredStudents.map((row, index) => (
 							<Fade key={row.user.externalId} in={true} timeout={300 + index * 100}>
 								<Card
@@ -440,9 +505,7 @@ export default function GradeBook({
 											startIcon={<SchoolIcon />}
 											onClick={(e) => {
 												e.preventDefault()
-												setIsModalOpen(true)
-												setSelectedStudent(row)
-												setUserDow(row.user.externalId)
+												handleCertificateClick(row)
 											}}
 											sx={{
 												background: isStudentPassed(row)
@@ -466,7 +529,11 @@ export default function GradeBook({
 							</Fade>
 						))
 					) : (
-						<div></div>
+						<Box sx={{ textAlign: "center", py: 4 }}>
+							<Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+								No hay estudiantes disponibles
+							</Typography>
+						</Box>
 					)}
 				</Box>
 			) : (
@@ -506,7 +573,7 @@ export default function GradeBook({
 								</TableRow>
 							</TableHead>
 							<TableBody>
-								{course.students ? (
+								{localStudents && localStudents.length > 0 ? (
 									filteredStudents.map((row, index) => (
 										<Fade key={row.user.name} in={true} timeout={200 + index * 50}>
 											<StyledTableRow>
@@ -574,9 +641,7 @@ export default function GradeBook({
 																startIcon={<SchoolIcon />}
 																onClick={(e) => {
 																	e.preventDefault()
-																	setIsModalOpen(true)
-																	setSelectedStudent(row)
-																	setUserDow(row.user.externalId)
+																	handleCertificateClick(row)
 																}}
 																sx={{
 																	background: isStudentPassed(row)
@@ -603,7 +668,13 @@ export default function GradeBook({
 										</Fade>
 									))
 								) : (
-									<div></div>
+									<StyledTableRow>
+										<StyledTableCell colSpan={5} align="center">
+											<Typography variant="body2" sx={{ py: 3, color: theme.palette.text.secondary }}>
+												No hay estudiantes disponibles
+											</Typography>
+										</StyledTableCell>
+									</StyledTableRow>
 								)}
 							</TableBody>
 						</Table>
@@ -614,7 +685,7 @@ export default function GradeBook({
 			{/* Modal compacto mejorado */}
 			<Modal
 				open={isModalOpen}
-				onClose={() => setIsModalOpen(false)}
+				onClose={closeModal}
 				closeAfterTransition
 				sx={{
 					zIndex: theme.zIndex.modal + 1,
@@ -642,11 +713,11 @@ export default function GradeBook({
 							p: 3,
 							outline: "none",
 						}}
-						onClick={() => setIsModalOpen(false)}
+						onClick={closeModal}
 					>
 						{/* Botón de cerrar en la esquina superior derecha de toda la ventana */}
 						<IconButton
-							onClick={() => setIsModalOpen(false)}
+							onClick={closeModal}
 							sx={{
 								position: "fixed",
 								top: 20,
@@ -712,139 +783,151 @@ export default function GradeBook({
 									overflow: "auto",
 								}}
 							>
-								<Box
-									className={style.imageContainer}
-									ref={containerRef}
-									onMouseMove={handleMouseMove}
-									onMouseUp={handleMouseUp}
-									sx={{
-										position: "relative",
-										width: "900px", // Dimensión fija crucial para posicionamiento consistente
-										height: "100%",
-										minHeight: "530px", // Altura mínima como en el CSS original
-										display: "block", // Cambiar de flex a block para posicionamiento correcto
-										boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
-										borderRadius: 2,
-										overflow: "hidden",
-										background: "#ffffff",
-									}}
-								>
-									{lodingImage ? (
-										<>
-											<img
-												src={imageCert || "/placeholder.svg"}
-												alt="Certificado"
-												className={style.modalImage}
-												style={{
-													minWidth: "900px",
-													maxHeight: "530px", 
-													width: "900px",
-													height: "auto",
-													objectFit: "contain",
-													display: "block",
-												}}
-											/>
-											<span
-												className={`draggableLabel ${draggingElement === "name" ? "dragging" : ""}`}
-												id="name"
-												onMouseDown={(e) => handleMouseDown(e, "name")}
-												style={{
-													position: "absolute",
-													top: `${namePosition.top}px`,
-													left: `${namePosition.left}px`,
-													fontSize: `${nameProperties.fontSize}px`,
-													fontFamily: nameProperties.fontFamily,
-													color: nameProperties.color,
-													fontStyle: nameProperties.isItalic ? "italic" : "normal",
-													fontWeight: nameProperties.isBold ? "bold" : "normal",
-													background: "transparent",
-													padding: "5px",
-													cursor: "move",
-													userSelect: "none",
-													transform: "translate(-50%, 0)", // Centrar horizontalmente
-												}}
-											/>
-											<span
-												className={`draggableLabel ${draggingElement === "id" ? "dragging" : ""}`}
-												id="cedula"
-												onMouseDown={(e) => handleMouseDown(e, "id")}
-												style={{
-													position: "absolute",
-													top: `${idPosition.top}px`,
-													left: `${idPosition.left}px`,
-													fontSize: `${idProperties.fontSize}px`,
-													fontFamily: idProperties.fontFamily,
-													color: idProperties.color,
-													background: "transparent",
-													fontStyle: idProperties.isItalic ? "italic" : "normal",
-													fontWeight: idProperties.isBold ? "bold" : "normal",
-													padding: "5px",
-													cursor: "move",
-													userSelect: "none",
-													transform: "translate(-50%, 0)", // Centrar horizontalmente
-												}}
-											/>
-											<span
-												className={`draggableLabel ${draggingElement === "courseName" ? "dragging" : ""}`}
-												id="courseName"
-												onMouseDown={(e) => handleMouseDown(e, "courseName")}
-												style={{
-													position: "absolute",
-													top: `${courseNamePosition.top}px`,
-													left: `${courseNamePosition.left}px`,
-													fontSize: `${courseNameProperties.fontSize}px`,
-													fontFamily: courseNameProperties.fontFamily,
-													color: courseNameProperties.color,
-													background: "transparent",
-													fontStyle: courseNameProperties.isItalic ? "italic" : "normal",
-													fontWeight: courseNameProperties.isBold ? "bold" : "normal",
-													padding: "5px",
-													cursor: "move",
-													userSelect: "none",
-													transform: "translate(-50%, 0)", // Centrar horizontalmente
-												}}
-											>
-												{"Nombre del curso"}
-											</span>
-											<span
-												className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}
-												id="createdAt"
-												onMouseDown={(e) => handleMouseDown(e, "createdAt")}
-												style={{
-													position: "absolute",
-													top: `${createdAtPosition.top}px`,
-													left: `${createdAtPosition.left}px`,
-													fontSize: `${createdAtProperties.fontSize}px`,
-													fontFamily: createdAtProperties.fontFamily,
-													color: createdAtProperties.color,
-													background: "transparent",
-													fontStyle: createdAtProperties.isItalic ? "italic" : "normal",
-													fontWeight: createdAtProperties.isBold ? "bold" : "normal",
-													padding: "5px",
-													cursor: "move",
-													userSelect: "none",
-													transform: "translate(-50%, 0)", // Centrar horizontalmente
-												}}
-											>
-												{new Date().toLocaleDateString()}
-											</span>
-										</>
-									) : (
-										<Box
-											sx={{
-												width: 600,
-												height: 400,
-												display: "flex",
-												alignItems: "center",
-												justifyContent: "center",
-												background: "#ffffff",
-												borderRadius: 2,
+								{!lodingImage ? (
+									// Loader mientras se cargan los datos
+									<Box
+										sx={{
+											width: "900px",
+											height: "530px",
+											display: "flex",
+											flexDirection: "column",
+											alignItems: "center",
+											justifyContent: "center",
+											background: "#ffffff",
+											borderRadius: 2,
+											boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+										}}
+									>
+										<Loader ba={"transparent"} height={"150px"} color={"#156DF9"} load={2} />
+										<Typography 
+											variant="body2" 
+											sx={{ 
+												mt: 2, 
+												color: theme.palette.text.secondary,
+												fontWeight: 500 
 											}}
 										>
-											<Loader ba={"transparent"} height={"400px"} color={"#156DF9"} load={2} />
-										</Box>
-									)}
-								</Box>
+											Cargando datos del certificado...
+										</Typography>
+									</Box>
+								) : (
+									// Certificado con datos
+									<Box
+										className={style.imageContainer}
+										ref={containerRef}
+										onMouseMove={handleMouseMove}
+										onMouseUp={handleMouseUp}
+										sx={{
+											position: "relative",
+											width: "900px", // Dimensión fija crucial para posicionamiento consistente
+											height: "100%",
+											minHeight: "530px", // Altura mínima como en el CSS original
+											display: "block", // Cambiar de flex a block para posicionamiento correcto
+											boxShadow: "0 8px 32px rgba(0,0,0,0.2)",
+											borderRadius: 2,
+											overflow: "hidden",
+											background: "#ffffff",
+										}}
+									>
+										<img
+											src={imageCert || "/placeholder.svg"}
+											alt="Certificado"
+											className={style.modalImage}
+											style={{
+												minWidth: "900px",
+												maxHeight: "530px", 
+												width: "900px",
+												height: "auto",
+												objectFit: "contain",
+												display: "block",
+											}}
+										/>
+										<span
+											className={`draggableLabel ${draggingElement === "name" ? "dragging" : ""}`}
+											id="name"
+											onMouseDown={(e) => handleMouseDown(e, "name")}
+											style={{
+												position: "absolute",
+												top: `${namePosition.top}px`,
+												left: `${namePosition.left}px`,
+												fontSize: `${nameProperties.fontSize}px`,
+												fontFamily: nameProperties.fontFamily,
+												color: nameProperties.color,
+												fontStyle: nameProperties.isItalic ? "italic" : "normal",
+												fontWeight: nameProperties.isBold ? "bold" : "normal",
+												background: "transparent",
+												padding: "5px",
+												cursor: "move",
+												userSelect: "none",
+												transform: "translate(-50%, 0)", // Centrar horizontalmente
+											}}
+										/>
+										<span
+											className={`draggableLabel ${draggingElement === "id" ? "dragging" : ""}`}
+											id="cedula"
+											onMouseDown={(e) => handleMouseDown(e, "id")}
+											style={{
+												position: "absolute",
+												top: `${idPosition.top}px`,
+												left: `${idPosition.left}px`,
+												fontSize: `${idProperties.fontSize}px`,
+												fontFamily: idProperties.fontFamily,
+												color: idProperties.color,
+												background: "transparent",
+												fontStyle: idProperties.isItalic ? "italic" : "normal",
+												fontWeight: idProperties.isBold ? "bold" : "normal",
+												padding: "5px",
+												cursor: "move",
+												userSelect: "none",
+												transform: "translate(-50%, 0)", // Centrar horizontalmente
+											}}
+										/>
+										<span
+											className={`draggableLabel ${draggingElement === "courseName" ? "dragging" : ""}`}
+											id="courseName"
+											onMouseDown={(e) => handleMouseDown(e, "courseName")}
+											style={{
+												position: "absolute",
+												top: `${courseNamePosition.top}px`,
+												left: `${courseNamePosition.left}px`,
+												fontSize: `${courseNameProperties.fontSize}px`,
+												fontFamily: courseNameProperties.fontFamily,
+												color: courseNameProperties.color,
+												background: "transparent",
+												fontStyle: courseNameProperties.isItalic ? "italic" : "normal",
+												fontWeight: courseNameProperties.isBold ? "bold" : "normal",
+												padding: "5px",
+												cursor: "move",
+												userSelect: "none",
+												transform: "translate(-50%, 0)", // Centrar horizontalmente
+											}}
+										>
+											{"Nombre del curso"}
+										</span>
+										<span
+											className={`draggableLabel ${draggingElement === "date" ? "dragging" : ""}`}
+											id="date"
+											onMouseDown={(e) => handleMouseDown(e, "date")}
+											style={{
+												position: "absolute",
+												top: `${datePosition.top}px`,
+												left: `${datePosition.left}px`,
+												fontSize: `${dateProperties.fontSize}px`,
+												fontFamily: dateProperties.fontFamily,
+												color: dateProperties.color,
+												background: "transparent",
+												fontStyle: dateProperties.isItalic ? "italic" : "normal",
+												fontWeight: dateProperties.isBold ? "bold" : "normal",
+												padding: "5px",
+												cursor: "move",
+												userSelect: "none",
+												transform: "translate(-50%, 0)", // Centrar horizontalmente
+											}}
+										>
+											{new Date().toLocaleDateString()}
+										</span>
+									</Box>
+								)}
 							</Box>
 
 							{/* Footer con botón de descarga */}
@@ -857,7 +940,7 @@ export default function GradeBook({
 									justifyContent: "center",
 								}}
 							>
-								<DownloadButton />
+								{lodingImage && certificateData ? <DownloadButton /> : null}
 							</Box>
 						</Box>
 					</Box>

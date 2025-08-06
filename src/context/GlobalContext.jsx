@@ -106,8 +106,10 @@ const ContextProvider = ({ children }) => {
 
     const getUserCertificate = async (userId, courseId) => {
         try {
-
+            // console.log(`🔄 Llamando API: /user-certificate/${userId}/${courseId}`)
+            
             const result = await api.get(`/user-certificate/${userId}/${courseId}`);
+            // console.log("📡 Respuesta de la API:", result.data)
 
             const certificateData = result.data
             // Guardar los datos del certificado con la clave esperada por Student.jsx
@@ -121,10 +123,14 @@ const ContextProvider = ({ children }) => {
                 payload: dataCourse
             })
 
-        } catch (error) {
-            console.log('error al cargar el certificado');
-        }
+            // ✅ IMPORTANTE: Retornar los datos del certificado
+            // console.log("✅ Retornando certificateData:", certificateData)
+            return certificateData;
 
+        } catch (error) {
+            console.log('❌ Error al cargar el certificado:', error);
+            return null; // Retornar null en caso de error
+        }
     }
 
 

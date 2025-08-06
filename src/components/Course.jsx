@@ -59,8 +59,8 @@ const Course = () => {
 		isBold: false,
 	})
 	
-	// Propiedades de la fecha de creación
-	const [createdAtProperties, setCreatedAtProperties] = useState({
+	// Propiedades de la fecha
+	const [dateProperties, setDateProperties] = useState({
 		fontSize: 12,
 		fontFamily: "Arial",
 		color: "#666666",
@@ -72,7 +72,7 @@ const Course = () => {
 	const [namePosition, setNamePosition] = useState({ top: 200, left: 100 })
 	const [idPosition, setIdPosition] = useState({ top: 250, left: 100 })
 	const [courseNamePosition, setcourseNamePosition] = useState({ top: 400, left: 150 })
-	const [createdAtPosition, setCreatedAtPosition] = useState({ top: 450, left: 150 })
+	const [datePosition, setDatePosition] = useState({ top: 450, left: 150 })
 	const [imageCert, setImageCert] = useState(null)
 	const [reqScore, setReqScore] = useState(null)
 	const [lodignGrade, setLodingGrade] = useState(false)
@@ -99,8 +99,8 @@ const Course = () => {
 		}))
 	}
 
-	const updateCreatedAtProperty = (property, value) => {
-		setCreatedAtProperties(prev => ({
+	const updateDateProperty = (property, value) => {
+		setDateProperties(prev => ({
 			...prev,
 			[property]: value
 		}))
@@ -112,7 +112,7 @@ const Course = () => {
 			case "name": return nameProperties
 			case "id": return idProperties
 			case "courseName": return courseNameProperties
-			case "createdAt": return createdAtProperties
+			case "date": return dateProperties
 			default: return nameProperties
 		}
 	}
@@ -129,8 +129,8 @@ const Course = () => {
 			case "courseName":
 				updatecourseNameProperty(property, value)
 				break
-			case "createdAt":
-				updateCreatedAtProperty(property, value)
+			case "date":
+				updateDateProperty(property, value)
 				break
 		}
 	}
@@ -221,11 +221,11 @@ const Course = () => {
 									nameProperties={nameProperties}
 									idProperties={idProperties}
 									courseNameProperties={courseNameProperties}
-									createdAtProperties={createdAtProperties}
+									dateProperties={dateProperties}
 									updateNameProperty={updateNameProperty}
 									updateIdProperty={updateIdProperty}
 									updatecourseNameProperty={updatecourseNameProperty}
-									updateCreatedAtProperty={updateCreatedAtProperty}
+									updateDateProperty={updateDateProperty}
 									
 									// Posiciones
 									namePosition={namePosition}
@@ -234,8 +234,8 @@ const Course = () => {
 									setIdPosition={setIdPosition}
 									courseNamePosition={courseNamePosition}
 									setcourseNamePosition={setcourseNamePosition}
-									createdAtPosition={createdAtPosition}
-									setCreatedAtPosition={setCreatedAtPosition}
+									datePosition={datePosition}
+									setDatePosition={setDatePosition}
 									
 									// Otros estados
 									imageCert={imageCert}
@@ -266,11 +266,11 @@ const Course = () => {
 											nameProperties={nameProperties}
 											idProperties={idProperties}
 											courseNameProperties={courseNameProperties}
-											createdAtProperties={createdAtProperties}
+											dateProperties={dateProperties}
 											namePosition={namePosition}
 											idPosition={idPosition}
 											courseNamePosition={courseNamePosition}
-											createdAtPosition={createdAtPosition}
+											datePosition={datePosition}
 											imageCert={imageCert}
 											reqScore={reqScore}
 										/>

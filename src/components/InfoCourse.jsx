@@ -43,30 +43,30 @@ import Toolbar from "./Toolbar"
 
 const InfoCourse = ({
 	// Elemento seleccionado y sus propiedades
-	selectedElement,
+	selectedElement = "name",
 	setSelectedElement,
-	currentProperties,
+	currentProperties = {},
 	updateCurrentProperty,
 	
 	// Propiedades individuales
-	nameProperties,
-	idProperties,
-	courseNameProperties,
-	createdAtProperties,
+	nameProperties = {},
+	idProperties = {},
+	courseNameProperties = {},
+	dateProperties = {},
 	updateNameProperty,
 	updateIdProperty,
 	updatecourseNameProperty,
-	updateCreatedAtProperty,
+	updateDateProperty,
 	
 	// Posiciones
-	namePosition,
+	namePosition = { top: 200, left: 100 },
 	setNamePosition,
-	idPosition,
+	idPosition = { top: 250, left: 100 },
 	setIdPosition,
-	courseNamePosition,
+	courseNamePosition = { top: 300, left: 100 },
 	setcourseNamePosition,
-	createdAtPosition,
-	setCreatedAtPosition,
+	datePosition = { top: 350, left: 100 },
+	setDatePosition,
 	
 	// Otros estados
 	imageCert,
@@ -87,6 +87,7 @@ const InfoCourse = ({
 	const [loaderImgPre, setLoaderImgPre] = useState(false)
 	const [backgroundSp, setBackgroundSp] = useState(false)
 	const [uploadProgress, setUploadProgress] = useState(0)
+	const [courseLoaded, setCourseLoaded] = useState(false)
 
 	const { course } = useStateValue()
 	const theme = useTheme()
@@ -116,8 +117,8 @@ const InfoCourse = ({
 				setIdPosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "courseName") {
 				setcourseNamePosition({ top: deltaY, left: deltaX })
-			} else if (draggingElement === "createdAt") {
-				setCreatedAtPosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "date") {
+				setDatePosition({ top: deltaY, left: deltaX })
 			}
 		}
 	}
@@ -149,8 +150,8 @@ const InfoCourse = ({
 				setIdPosition({ top: deltaY, left: deltaX })
 			} else if (draggingElement === "courseName") {
 				setcourseNamePosition({ top: deltaY, left: deltaX })
-			} else if (draggingElement === "createdAt") {
-				setCreatedAtPosition({ top: deltaY, left: deltaX })
+			} else if (draggingElement === "date") {
+				setDatePosition({ top: deltaY, left: deltaX })
 			}
 		}
 	}
@@ -183,6 +184,11 @@ const InfoCourse = ({
 			return
 		}
 
+		if (!course?.course?.courseId) {
+			alert("Error: Información del curso no disponible")
+			return
+		}
+
 		const formData = new FormData()
 		formData.append("certificado", file)
 		formData.append("courseId", course.course.courseId)
@@ -207,7 +213,7 @@ const InfoCourse = ({
 			const data = await response.data
 
 			if (data) {
-				const res = await api.get(`/certificateCourse/${course.course.courseId}`)
+				const res = await api.get(`/certificateCourse/${course?.course?.courseId}`)
 
 				// Configurar propiedades para ambos elementos basándose en los datos de la API
 				updateNameProperty('color', res.data.payload.color)
@@ -244,6 +250,11 @@ const InfoCourse = ({
 	}
 
 	const saveReqCal = async (value) => {
+		if (!course?.course?.courseId) {
+			alert("Error: Información del curso no disponible")
+			return
+		}
+
 		const reqResult = value / 100
 		setIsSaved(true)
 
@@ -273,6 +284,13 @@ const InfoCourse = ({
 
 	useEffect(() => {
 		const validateCertificate = async () => {
+			if (!course?.course?.courseId) {
+				// console.log("Course information not available yet")
+				return
+			}
+
+			setCourseLoaded(true)
+
 			try {
 				const dataCertificate = JSON.parse(localStorage.getItem("cetificate_data"))
 
@@ -298,16 +316,16 @@ const InfoCourse = ({
 						updatecourseNameProperty('isItalic', dataCertificate.payload.courseNameItalic !== undefined ? dataCertificate.payload.courseNameItalic : dataCertificate.payload.italic)
 						updatecourseNameProperty('isBold', dataCertificate.payload.courseNameBold !== undefined ? dataCertificate.payload.courseNameBold : (dataCertificate.payload.bold || false))
 						
-						updateCreatedAtProperty('color', dataCertificate.payload.createdAtColor || dataCertificate.payload.color)
-						updateCreatedAtProperty('fontFamily', dataCertificate.payload.createdAtFontFamily || dataCertificate.payload.fontFamily)
-						updateCreatedAtProperty('fontSize', dataCertificate.payload.createdAtFontSize || dataCertificate.payload.fontsize)
-						updateCreatedAtProperty('isItalic', dataCertificate.payload.createdAtItalic !== undefined ? dataCertificate.payload.createdAtItalic : dataCertificate.payload.italic)
-						updateCreatedAtProperty('isBold', dataCertificate.payload.createdAtBold !== undefined ? dataCertificate.payload.createdAtBold : (dataCertificate.payload.bold || false))
+						updateDateProperty('color', dataCertificate.payload.dateColor || dataCertificate.payload.color)
+						updateDateProperty('fontFamily', dataCertificate.payload.dateFontFamily || dataCertificate.payload.fontFamily)
+						updateDateProperty('fontSize', dataCertificate.payload.dateFontSize || dataCertificate.payload.fontsize)
+						updateDateProperty('isItalic', dataCertificate.payload.dateItalic !== undefined ? dataCertificate.payload.dateItalic : dataCertificate.payload.italic)
+						updateDateProperty('isBold', dataCertificate.payload.dateBold !== undefined ? dataCertificate.payload.dateBold : (dataCertificate.payload.bold || false))
 						
 						setNamePosition({ top: dataCertificate.payload.nameY, left: dataCertificate.payload.nameX })
 						setIdPosition({ top: dataCertificate.payload.documentY, left: dataCertificate.payload.documentX })
 						setcourseNamePosition({ top: dataCertificate.payload.courseNameY || 300, left: dataCertificate.payload.courseNameX || 450 })
-						setCreatedAtPosition({ top: dataCertificate.payload.createdAtY || 350, left: dataCertificate.payload.createdAtX || 450 })
+						setDatePosition({ top: dataCertificate.payload.dateY || 350, left: dataCertificate.payload.dateX || 450 })
 
 						if (dataCertificate.payload.reqScore != 0) {
 							setIsSaved(true)
@@ -347,16 +365,16 @@ const InfoCourse = ({
 					updatecourseNameProperty('isItalic', res.data.payload.courseNameItalic !== undefined ? res.data.payload.courseNameItalic : res.data.payload.italic)
 					updatecourseNameProperty('isBold', res.data.payload.courseNameBold !== undefined ? res.data.payload.courseNameBold : (res.data.payload.bold || false))
 					
-					updateCreatedAtProperty('color', res.data.payload.createdAtColor || res.data.payload.color)
-					updateCreatedAtProperty('fontFamily', res.data.payload.createdAtFontFamily || res.data.payload.fontFamily)
-					updateCreatedAtProperty('fontSize', res.data.payload.createdAtFontSize || res.data.payload.fontsize)
-					updateCreatedAtProperty('isItalic', res.data.payload.createdAtItalic !== undefined ? res.data.payload.createdAtItalic : res.data.payload.italic)
-					updateCreatedAtProperty('isBold', res.data.payload.createdAtBold !== undefined ? res.data.payload.createdAtBold : (res.data.payload.bold || false))
+					updateDateProperty('color', res.data.payload.dateColor || res.data.payload.color)
+					updateDateProperty('fontFamily', res.data.payload.dateFontFamily || res.data.payload.fontFamily)
+					updateDateProperty('fontSize', res.data.payload.dateFontSize || res.data.payload.fontsize)
+					updateDateProperty('isItalic', res.data.payload.dateItalic !== undefined ? res.data.payload.dateItalic : res.data.payload.italic)
+					updateDateProperty('isBold', res.data.payload.dateBold !== undefined ? res.data.payload.dateBold : (res.data.payload.bold || false))
 					
 					setNamePosition({ top: res.data.payload.nameY, left: res.data.payload.nameX })
 					setIdPosition({ top: res.data.payload.documentY, left: res.data.payload.documentX })
 					setcourseNamePosition({ top: res.data.payload.courseNameY || 300, left: res.data.payload.courseNameX || 450 })
-					setCreatedAtPosition({ top: res.data.payload.createdAtY || 350, left: res.data.payload.createdAtX || 450 })
+					setDatePosition({ top: res.data.payload.dateY || 350, left: res.data.payload.dateX || 450 })
 
 					if (res.data.payload.reqScore != 0) {
 						setIsSaved(true)
@@ -381,11 +399,16 @@ const InfoCourse = ({
 			}
 		}
 		validateCertificate()
-	}, [])
+	}, [course?.course?.courseId]) // Solo depender del courseId, no del objeto completo
 
 	return (
 		<>
-			{isLodingInfo ? (
+			{/* Verificación de seguridad para course */}
+			{!courseLoaded ? (
+				<Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "200px" }}>
+					<Loader background={"transparent"} height={"200px"} color={"#1091F4"} load={1} />
+				</Box>
+			) : isLodingInfo ? (
 				<Box sx={{ mb: 2 }}>
 					{/* Header de información del curso */}
 					<Fade in={true} timeout={800}>
@@ -436,7 +459,7 @@ const InfoCourse = ({
 												textShadow: "0 2px 4px rgba(0,0,0,0.2)",
 											}}
 										>
-											{course.course.name}
+											{course?.course?.name || "Cargando..."}
 										</Typography>
 										<Typography
 											variant="h6"
@@ -447,7 +470,7 @@ const InfoCourse = ({
 												fontWeight: 500,
 											}}
 										>
-											ID: {course.course.courseId}
+											ID: {course?.course?.courseId || "..."}
 										</Typography>
 									</Box>
 								</Box>
@@ -884,17 +907,17 @@ const InfoCourse = ({
 											nameProperties={nameProperties}
 											idProperties={idProperties}
 											courseNameProperties={courseNameProperties}
-											createdAtProperties={createdAtProperties}
+											dateProperties={dateProperties}
 											
 											// Posiciones
 											namePosition={namePosition}
 											idPosition={idPosition}
 											courseNamePosition={courseNamePosition}
-											createdAtPosition={createdAtPosition}
+											datePosition={datePosition}
 											
 											// Props existentes que no cambian
 											setLodiangImage={setLodiangImage}
-											courseId={course.course.courseId}
+											courseId={course?.course?.courseId}
 											setValidateCert={setValidateCert}
 											setImageCert={setImageCert}
 											setIsModalOpen={setIsModalOpen}
@@ -1023,23 +1046,23 @@ const InfoCourse = ({
 														{"<<Nombre del curso>>"}
 													</span>
 													<span
-														className={`draggableLabel ${draggingElement === "createdAt" ? "dragging" : ""}`}
-														onMouseDown={(e) => handleMouseDown(e, "createdAt")}
-														onTouchStart={(e) => handleTouchStart(e, "createdAt")}
-														onClick={() => setSelectedElement("createdAt")}
+														className={`draggableLabel ${draggingElement === "date" ? "dragging" : ""}`}
+														onMouseDown={(e) => handleMouseDown(e, "date")}
+														onTouchStart={(e) => handleTouchStart(e, "date")}
+														onClick={() => setSelectedElement("date")}
 														style={{
 															position: "absolute",
-															top: `${createdAtPosition.top}px`,
-															left: `${createdAtPosition.left}px`,
-															fontSize: `${createdAtProperties.fontSize}px`,
-															fontFamily: createdAtProperties.fontFamily,
-															color: createdAtProperties.color,
-															fontStyle: createdAtProperties.isItalic ? "italic" : "normal",
-															fontWeight: createdAtProperties.isBold ? "bold" : "normal",
-															border: draggingElement === "createdAt" ? "2px solid #ff6600" : selectedElement === "createdAt" ? "2px solid #007bff" : "none",
+															top: `${datePosition.top}px`,
+															left: `${datePosition.left}px`,
+															fontSize: `${dateProperties.fontSize}px`,
+															fontFamily: dateProperties.fontFamily,
+															color: dateProperties.color,
+															fontStyle: dateProperties.isItalic ? "italic" : "normal",
+															fontWeight: dateProperties.isBold ? "bold" : "normal",
+															border: draggingElement === "date" ? "2px solid #ff6600" : selectedElement === "date" ? "2px solid #007bff" : "none",
 															padding: "5px",
 															cursor: "move",
-															background: backgroundSp ? "transparent" : selectedElement === "createdAt" ? "#d1ecf1" : "#e9e5e5b9",
+															background: backgroundSp ? "transparent" : selectedElement === "date" ? "#d1ecf1" : "#e9e5e5b9",
 															userSelect: "none",
 															transform: "translate(-50%, 0)", // Centrar horizontalmente
 														}}
