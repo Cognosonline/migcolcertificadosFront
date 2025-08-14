@@ -6,6 +6,7 @@ import style from "../modulesCss/InfoCourse.module.css";
 import { useEffect, useState } from "react";
 import api from "../../axiosConfig";
 import { useNotifications } from "../hooks/useNotifications";
+import { FontCategories } from "../utils/FontFamilies";
 
 const Toolbar = ({ 
   // Elemento seleccionado y sus propiedades
@@ -194,10 +195,23 @@ const Toolbar = ({
         />
 
         <label className={style.toolbarLabel}>Fuente:</label>
-        <select value={currentProperties.fontFamily} onChange={(e) => updateCurrentProperty('fontFamily', e.target.value)} className={style.toolbarSelect}>
-          <option value="Arial">Arial</option>
-          <option value="Verdana">Verdana</option>
-          <option value="Times New Roman">Times New Roman</option>
+        <select 
+          value={currentProperties.fontFamily} 
+          onChange={(e) => {
+            updateCurrentProperty('fontFamily', e.target.value);
+            showInfo(`Fuente cambiada a: ${e.target.value}`);
+          }} 
+          className={style.toolbarSelect}
+        >
+          {FontCategories.map((category) => (
+            <optgroup key={category.label} label={category.label}>
+              {category.fonts.map((font) => (
+                <option key={font.value} value={font.value} style={{ fontFamily: font.value }}>
+                  {font.label}
+                </option>
+              ))}
+            </optgroup>
+          ))}
         </select>
         <label className={style.toolbarLabel}>Cursiva:</label>
         <input

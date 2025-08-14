@@ -242,18 +242,19 @@
     top: 0px;
     right: 0;
     width: 95%;
-    max-width: 1000px; /* Aumentar el ancho máximo */
+    max-width: 1200px; /* Aumentar aún más el ancho máximo */
     margin-bottom: 5px;
     background: whitesmoke;
-    padding: 10px;
+    padding: 10px 120px 10px 10px; /* Agregar padding derecho para espacio de botones */
     border-radius: 10px;
     display: flex;
-    justify-content: center;
+    justify-content: flex-start; /* Cambiar a flex-start para mejor control */
     align-items: center;
     box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 10;
-    gap: 8px; /* Reducir ligeramente el gap para que quepa mejor */
-    flex-wrap: wrap; /* Permitir que se envuelvan en pantallas pequeñas */
+    gap: 12px; /* Aumentar el gap para mejor espaciado */
+    flex-wrap: nowrap; /* Evitar envolvimiento para mantener elementos en línea */
+    overflow-x: auto; /* Permitir scroll horizontal si es necesario */
 }
 
 .toolbarLabel {
@@ -274,32 +275,100 @@
 }
 
 .toolbarInput {
-    width: 45px; /* Reducir ligeramente el ancho */
+    width: 50px; /* Aumentar ligeramente el ancho */
     text-align: center;
+    margin-right: 8px; /* Agregar margen derecho */
 }
 
 .toolbarSelect {
-    width: 100px; /* Reducir el ancho de los selects */
+    width: 140px; /* Reducir un poco el ancho para que no se superponga */
+    max-width: 140px;
+    font-size: 11px; /* Reducir el tamaño de fuente */
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-right: 8px; /* Agregar margen derecho */
+}
+
+/* Estilos específicos para las opciones de fuentes */
+.toolbarSelect optgroup {
+    font-weight: bold;
+    color: #333;
+    background-color: #f5f5f5;
+}
+
+.toolbarSelect option {
+    padding: 4px 8px;
+    font-size: 12px;
+    color: #333;
+    background-color: white;
 }
 
 .toolbarColorPicker {
     cursor: pointer;
-    width: 35px; /* Reducir ligeramente el ancho */
-    height: 28px; /* Reducir ligeramente la altura */
-    border: none;
+    width: 40px; /* Aumentar ligeramente el ancho */
+    height: 32px; /* Aumentar ligeramente la altura */
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    margin-right: 8px; /* Agregar margen derecho para separar de otros elementos */
 }
 
 .toolbarCheckbox {
-    margin: 0 3px; /* Añadir margen para el checkbox */
+    margin: 0 8px; /* Aumentar margen para el checkbox */
+}
+
+/* Estilos responsivos para el toolbar */
+@media (max-width: 1200px) {
+    .toolbar {
+        padding: 8px 100px 8px 8px;
+        gap: 8px;
+    }
+    
+    .toolbarSelect {
+        width: 120px;
+        max-width: 120px;
+        font-size: 10px;
+    }
+    
+    .toolbarLabel {
+        font-size: 11px;
+    }
+}
+
+@media (max-width: 900px) {
+    .toolbar {
+        padding: 6px 80px 6px 6px;
+        gap: 6px;
+        flex-wrap: wrap;
+    }
+    
+    .toolbarSelect {
+        width: 100px;
+        max-width: 100px;
+    }
+    
+    .divSavedCert {
+        position: relative;
+        right: auto;
+        top: auto;
+        transform: none;
+        width: 100%;
+        justify-content: center;
+        margin-top: 8px;
+    }
 }
 
 .divSavedCert {
     position: absolute;
-    right: 0;
-    width: 15%;
-    height: 100%;
+    right: 10px; /* Aumentar la separación del borde */
+    top: 50%;
+    transform: translateY(-50%); /* Centrar verticalmente */
+    width: auto; /* Cambiar a ancho automático */
+    height: auto;
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 5px; /* Agregar espacio entre botones */
+    z-index: 15; /* Asegurar que esté por encima */
 }
 
 .loaderOverlay {
