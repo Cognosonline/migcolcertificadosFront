@@ -48,7 +48,7 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error);
-            showError(error?.data?.message || error?.data?.error || error?.response?.data?.error || 'Error de conexión con el api de BlackBoard');
+            showError(error?.response?.data?.message || error?.response?.data?.error || error?.data?.message || error?.data?.error || error?.response?.data?.error || 'Error de conexión con el api de BlackBoard');
         }
     }
 
@@ -116,14 +116,14 @@ const ContextProvider = ({ children }) => {
     const getUserCertificate = async (userId, courseId) => {
         try {
             // console.log(`🔄 Llamando API: /user-certificate/${userId}/${courseId}`)
-            
+
             const result = await api.get(`/user-certificate/${userId}/${courseId}`);
             // console.log("📡 Respuesta de la API:", result.data)
 
             const certificateData = result.data
             // Guardar los datos del certificado con una clave específica
             localStorage.setItem('certificate_student_data', JSON.stringify(certificateData));
-            
+
             // Guardar datos del certificado en sessionStorage con clave específica
             saveCertificateCourseData(certificateData);
 
