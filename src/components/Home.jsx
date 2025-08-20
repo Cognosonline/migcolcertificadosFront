@@ -89,7 +89,7 @@ const Home = () => {
           }
         } catch (error) {
           console.error("Error al obtener los cursos:", error)
-          showError( error?.response?.data?.error ||'Error al obtener los cursos');
+          showError(error?.data?.message || error?.data?.error || error?.response?.data?.error || 'Error de conexión con el api de BlackBoard');
         } finally {
           setShowCourses(true)
         }
