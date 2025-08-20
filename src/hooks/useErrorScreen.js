@@ -22,7 +22,7 @@ export const useErrorScreen = () => {
   };
 
   const showNetworkError = (retryAction) => {
-    showError('No se pudo establecer conexión con el servidor. Verifica tu conexión a internet.', {
+    showError('Error al obtener el certificado del usuario', {
       title: 'Error de conexión',
       subtitle: 'Problema de conectividad',
       type: 'network',
