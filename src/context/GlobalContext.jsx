@@ -48,8 +48,7 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error);
-            showError('Error al iniciar sesión');
-            showError('Error al iniciar sesión');
+            showError(error?.data?.message || error?.data?.error || error?.response?.data?.error || 'Error de conexión con el api de BlackBoard');
         }
     }
 
