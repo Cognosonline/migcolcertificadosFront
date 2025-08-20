@@ -48,7 +48,30 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error);
-            showError(error?.response?.data?.message || error?.response?.data?.error || error?.data?.message || error?.data?.error || error?.response?.data?.error || 'Error de conexión con el api de BlackBoard');
+            
+            // Manejo mejorado de errores de Axios
+            let errorMessage = 'Error de conexión con el api de BlackBoard';
+            
+            if (error.response) {
+                const status = error.response.status;
+                const serverMessage = error.response.data?.message || error.response.data?.error;
+                
+                if (status === 401) {
+                    errorMessage = 'Credenciales inválidas. Verifica tu usuario.';
+                } else if (status === 404) {
+                    errorMessage = 'Usuario no encontrado.';
+                } else if (status === 500) {
+                    errorMessage = `Error interno del servidor. ${serverMessage || 'Intenta nuevamente más tarde.'}`;
+                } else {
+                    errorMessage = serverMessage || `Error ${status} en el servidor`;
+                }
+            } else if (error.request) {
+                errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+            } else {
+                errorMessage = error.message || 'Error inesperado al iniciar sesión.';
+            }
+            
+            showError(errorMessage);
         }
     }
 
@@ -87,7 +110,30 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log(error);
-            showError('Error al cargar los cursos');
+            
+            // Manejo mejorado de errores
+            let errorMessage = 'Error al cargar los cursos';
+            
+            if (error.response) {
+                const status = error.response.status;
+                const serverMessage = error.response.data?.message || error.response.data?.error;
+                
+                if (status === 401) {
+                    errorMessage = 'No tienes autorización para ver los cursos.';
+                } else if (status === 404) {
+                    errorMessage = 'No se encontraron cursos para este usuario.';
+                } else if (status === 500) {
+                    errorMessage = `Error interno del servidor. ${serverMessage || 'Intenta nuevamente más tarde.'}`;
+                } else {
+                    errorMessage = serverMessage || `Error ${status} al cargar los cursos`;
+                }
+            } else if (error.request) {
+                errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+            } else {
+                errorMessage = error.message || 'Error inesperado al cargar los cursos.';
+            }
+            
+            showError(errorMessage);
         }
     };
 
@@ -108,7 +154,30 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log('error al cargar el curso');
-            showError('Error al cargar el curso');
+            
+            // Manejo mejorado de errores
+            let errorMessage = 'Error al cargar el curso';
+            
+            if (error.response) {
+                const status = error.response.status;
+                const serverMessage = error.response.data?.message || error.response.data?.error;
+                
+                if (status === 404) {
+                    errorMessage = 'Curso no encontrado.';
+                } else if (status === 401) {
+                    errorMessage = 'No tienes autorización para ver este curso.';
+                } else if (status === 500) {
+                    errorMessage = `Error interno del servidor. ${serverMessage || 'Intenta nuevamente más tarde.'}`;
+                } else {
+                    errorMessage = serverMessage || `Error ${status} al cargar el curso`;
+                }
+            } else if (error.request) {
+                errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+            } else {
+                errorMessage = error.message || 'Error inesperado al cargar el curso.';
+            }
+            
+            showError(errorMessage);
         }
 
     }
@@ -143,7 +212,33 @@ const ContextProvider = ({ children }) => {
 
         } catch (error) {
             console.log('❌ Error al cargar el certificado:', error);
-            showError('Error al cargar el certificado');
+            
+            // Manejo mejorado de errores de Axios
+            let errorMessage = 'Error al cargar el certificado';
+            
+            if (error.response) {
+                // Error de respuesta del servidor (4xx, 5xx)
+                const status = error.response.status;
+                const serverMessage = error.response.data?.message || error.response.data?.error;
+                
+                if (status === 500) {
+                    errorMessage = `Error interno del servidor (${status}). ${serverMessage || 'Por favor, intenta nuevamente más tarde.'}`;
+                } else if (status === 404) {
+                    errorMessage = 'Certificado no encontrado para este usuario y curso.';
+                } else if (status === 401) {
+                    errorMessage = 'No tienes autorización para acceder a este certificado.';
+                } else {
+                    errorMessage = `Error ${status}: ${serverMessage || 'Error en el servidor'}`;
+                }
+            } else if (error.request) {
+                // Error de red (no hay respuesta)
+                errorMessage = 'Error de conexión. Verifica tu conexión a internet.';
+            } else {
+                // Error de configuración
+                errorMessage = error.message || 'Error inesperado al procesar la solicitud.';
+            }
+            
+            showError(errorMessage);
             return null; // Retornar null en caso de error
         }
     }
