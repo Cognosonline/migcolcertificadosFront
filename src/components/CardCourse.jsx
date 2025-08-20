@@ -26,6 +26,7 @@ import { LoadingButton } from '@mui/lab';
 
 import { useStateValue } from '../context/GlobalContext';
 import { useNotifications } from "../hooks/useNotifications";
+import ErrorScreen from './ErrorScreen.jsx';
 import api from '../../axiosConfig';
 
 const CardCourse = (props) => {
@@ -42,11 +43,81 @@ const CardCourse = (props) => {
 		reqScore: 0
 	});
 
+	// Estado para manejar errores críticos
+	const [errorState, setErrorState] = useState({
+		show: false,
+		message: '',
+		details: '',
+		canRetry: false,
+		retryAction: null
+	});
+
 	//const [toolView, setToolView] = useState(true);
 	const { showSuccess, showError, showWarning, showInfo } = useNotifications();
 
 	const isStudent = course.role === 'Student';
 	const isProfessor = course.role === 'Instructor' || course.role === 'A';
+
+	// Funciones para manejar errores críticos
+	const showCriticalError = (error, retryAction = null) => {
+		let errorInfo = {
+			show: true,
+			message: 'Error inesperado',
+			details: 'Ha ocurrido un error al procesar la solicitud',
+			canRetry: false,
+			retryAction: null
+		};
+
+		if (error.response) {
+			const status = error.response.status;
+			const serverMessage = error.response.data?.message || error.response.data?.error;
+
+			if (status >= 500) {
+				errorInfo = {
+					show: true,
+					message: 'Error del servidor',
+					details: `Error ${status}: ${serverMessage || 'El servidor está experimentando problemas. Por favor, intenta nuevamente más tarde.'}`,
+					canRetry: true,
+					retryAction
+				};
+			} else if (status === 401) {
+				errorInfo = {
+					show: true,
+					message: 'Sesión expirada',
+					details: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+					canRetry: false,
+					retryAction: null
+				};
+			}
+		} else if (error.request) {
+			errorInfo = {
+				show: true,
+				message: 'Error de conexión',
+				details: 'No se pudo establecer conexión con el servidor. Verifica tu conexión a internet.',
+				canRetry: true,
+				retryAction
+			};
+		}
+
+		setErrorState(errorInfo);
+	};
+
+	const hideCriticalError = () => {
+		setErrorState({
+			show: false,
+			message: '',
+			details: '',
+			canRetry: false,
+			retryAction: null
+		});
+	};
+
+	const handleRetry = () => {
+		hideCriticalError();
+		if (errorState.retryAction && typeof errorState.retryAction === 'function') {
+			errorState.retryAction();
+		}
+	};
 
 	const courseSelect = async (e) => {
 		setIsLoading(true);
@@ -83,7 +154,18 @@ const CardCourse = (props) => {
 			navigate('/student');
 		} catch (error) {
 			console.log('Error al obtener el certificado:', error);
-			showError( error?.response?.data?.error ||'Error al cargar el certificado');
+			
+			// Determinar si es un error crítico o menor
+			if (error.response && error.response.status >= 500) {
+				// Error crítico - mostrar pantalla completa
+				showCriticalError(error, () => viewCertificateStudent(e));
+			} else if (error.request) {
+				// Error de red - mostrar pantalla completa
+				showCriticalError(error, () => viewCertificateStudent(e));
+			} else {
+				// Error menor - mostrar notificación
+				showError(error?.response?.data?.error || 'Error al cargar el certificado');
+			}
 		} finally {
 			setIsLoading(false);
 		}
@@ -354,6 +436,18 @@ const CardCourse = (props) => {
 						{roleConfig.action}
 					</LoadingButton>
 				</CardActions>
+
+				{/* ErrorScreen para errores críticos */}
+				{errorState.show && (
+					<ErrorScreen
+						error={errorState.details}
+						title={errorState.message}
+						subtitle="Error al procesar la solicitud"
+						onClose={hideCriticalError}
+						onRetry={errorState.canRetry ? handleRetry : undefined}
+						showRetry={errorState.canRetry}
+					/>
+				)}
 			</Card>
 		</Fade>
 	);

@@ -8,6 +8,7 @@ import style from "../modulesCss/Student.module.css"
 import { useNavigate } from "react-router-dom"
 import api from "../../axiosConfig.js"
 import Loader from "./Loader.jsx"
+import ErrorScreen from "./ErrorScreen.jsx"
 import { jsPDF } from "jspdf"
 import html2canvas from "html2canvas"
 
@@ -16,6 +17,15 @@ const Student = () => {
   
   // Estado para los datos del certificado
   const [certificateData, setCertificateData] = useState(null)
+  
+  // Estado para manejar errores localmente
+  const [errorState, setErrorState] = useState({
+    show: false,
+    message: '',
+    details: '',
+    canRetry: false,
+    retryAction: null
+  })
   
   // Propiedades del nombre
   const [nameProperties, setNameProperties] = useState({
@@ -63,6 +73,75 @@ const Student = () => {
   const [isDownloading, setIsDownloading] = useState(false)
   const navigate = useNavigate()
   const theme = useTheme()
+
+  // Funciones para manejar errores
+  const showError = (error, retryAction = null) => {
+    let errorInfo = {
+      show: true,
+      message: 'Error inesperado',
+      details: 'Ha ocurrido un error al cargar el certificado',
+      canRetry: false,
+      retryAction: null
+    }
+
+    if (error.response) {
+      const status = error.response.status
+      const serverMessage = error.response.data?.message || error.response.data?.error
+
+      if (status >= 500) {
+        errorInfo = {
+          show: true,
+          message: 'Error del servidor',
+          details: `Error ${status}: ${serverMessage || 'El servidor está experimentando problemas. Por favor, intenta nuevamente más tarde.'}`,
+          canRetry: true,
+          retryAction
+        }
+      } else if (status === 401) {
+        errorInfo = {
+          show: true,
+          message: 'Sesión expirada',
+          details: 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.',
+          canRetry: false,
+          retryAction: null
+        }
+      } else if (status === 404) {
+        errorInfo = {
+          show: true,
+          message: 'Certificado no encontrado',
+          details: 'No se pudo encontrar el certificado para este usuario y curso.',
+          canRetry: false,
+          retryAction: null
+        }
+      }
+    } else if (error.request) {
+      errorInfo = {
+        show: true,
+        message: 'Error de conexión',
+        details: 'No se pudo establecer conexión con el servidor. Verifica tu conexión a internet.',
+        canRetry: true,
+        retryAction
+      }
+    }
+
+    setErrorState(errorInfo)
+  }
+
+  const hideError = () => {
+    setErrorState({
+      show: false,
+      message: '',
+      details: '',
+      canRetry: false,
+      retryAction: null
+    })
+  }
+
+  const handleRetry = () => {
+    hideError()
+    if (errorState.retryAction && typeof errorState.retryAction === 'function') {
+      errorState.retryAction()
+    }
+  }
 
   const handleCloseModal = (e) => {
     e.preventDefault()
@@ -208,9 +287,16 @@ const Student = () => {
             const resCert = await api.get(`/certificate/${cert.fileName}`)
             setImageCert(resCert.data.image)
           }
+        } else {
+          // Si no hay datos del certificado en localStorage, mostrar error
+          showError({
+            message: 'No se encontraron datos del certificado',
+            request: true
+          }, () => navigate('/home'))
         }
       } catch (error) {
-        console.log(error)
+        console.log('Error al validar certificado:', error)
+        showError(error, () => validateCertificate())
       }
     }
 
@@ -577,6 +663,21 @@ const Student = () => {
           </Box>
         </Box>
       </Fade>
+
+      {/* ErrorScreen para errores críticos */}
+      {errorState.show && (
+        <ErrorScreen
+          error={errorState.details}
+          title={errorState.message}
+          subtitle="Error en el certificado"
+          onClose={() => {
+            hideError()
+            navigate('/home')
+          }}
+          onRetry={errorState.canRetry ? handleRetry : undefined}
+          showRetry={errorState.canRetry}
+        />
+      )}
     </Box>
   )
 }

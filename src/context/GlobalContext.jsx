@@ -49,7 +49,7 @@ const ContextProvider = ({ children }) => {
         } catch (error) {
             console.log(error);
             
-            // Manejo mejorado de errores de Axios
+            // Manejo simple de errores con notificaciones
             let errorMessage = 'Error de conexión con el api de BlackBoard';
             
             if (error.response) {
@@ -111,7 +111,7 @@ const ContextProvider = ({ children }) => {
         } catch (error) {
             console.log(error);
             
-            // Manejo mejorado de errores
+            // Manejo simple de errores con notificaciones
             let errorMessage = 'Error al cargar los cursos';
             
             if (error.response) {
@@ -155,7 +155,7 @@ const ContextProvider = ({ children }) => {
         } catch (error) {
             console.log('error al cargar el curso');
             
-            // Manejo mejorado de errores
+            // Manejo simple de errores con notificaciones
             let errorMessage = 'Error al cargar el curso';
             
             if (error.response) {
