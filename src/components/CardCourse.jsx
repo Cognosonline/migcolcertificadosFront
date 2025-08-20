@@ -93,7 +93,7 @@ const CardCourse = (props) => {
 			errorInfo = {
 				show: true,
 				message: 'Error de conexión',
-				details: 'No se pudo establecer conexión con el servidor. Verifica tu conexión a internet.',
+				details: 'Error al obtener el certificado del usuario',
 				canRetry: true,
 				retryAction
 			};
