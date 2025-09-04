@@ -589,7 +589,11 @@ const Student = () => {
                 padding: "5px", // PADDING ORIGINAL EXACTO
                 textShadow: "0 2px 4px rgba(0,0,0,0.1)",
                 letterSpacing: "0.5px",
-                transform: "translate(-50%, 0)", // CENTRADO CSS IGUAL QUE OTROS COMPONENTES
+                minWidth: "400px", // Ancho mínimo amplio para nombres largos
+                maxWidth: "800px", // Ancho máximo muy amplio
+                whiteSpace: "nowrap", // Evitar salto de línea
+                textAlign: "center", // Centrar el texto dentro del contenedor
+                // Removido: transform: "translate(-50%, 0)" para evitar cortes
               }}
             >
               {certificateData?.studentName?.toUpperCase() || "NOMBRE DEL ESTUDIANTE"}

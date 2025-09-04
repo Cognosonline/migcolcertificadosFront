@@ -873,7 +873,11 @@ export default function GradeBook({
 												padding: "5px",
 												cursor: "move",
 												userSelect: "none",
-												transform: "translate(-50%, 0)", // Centrar horizontalmente
+												minWidth: "400px", // Ancho mínimo amplio para nombres largos
+												maxWidth: "800px", // Ancho máximo muy amplio
+												whiteSpace: "nowrap", // Evitar salto de línea
+												textAlign: "center", // Centrar el texto dentro del contenedor
+												// Removido: transform: "translate(-50%, 0)" para evitar cortes
 											}}
 										/>
 										<span
